@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Protocol">
+<meta name="theme-color" content="#0E1320">
+<title>The Hollywood Protocol · Companion v6</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap');
+:root{
+  --paper:#F4F6F9; --ptxt:#0E1320;
+  --txt:#EFF3F8; --mut:#93A0B5;
+  --acc:#3B82FF; --accso:rgba(59,130,255,.16); --accbr:rgba(59,130,255,.5);
+  --ok:#41D6A8; --warn:#FFA94D; --bad:#FF5C5C;
+  --surf:rgba(255,255,255,.05); --surf2:rgba(255,255,255,.085);
+  --glassbg:rgba(21,28,42,.55); --hair:rgba(160,180,210,.12);
+  --blur:blur(16px) saturate(1.3);
+  --sh1:inset 0 1px 0 rgba(255,255,255,.05), 0 10px 30px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
+  --sh2:inset 0 1px 0 rgba(255,255,255,.07), 0 18px 44px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+  --shacc:0 10px 26px rgba(59,130,255,.35), 0 2px 8px rgba(0,0,0,.3);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --easeo:cubic-bezier(.22,1,.36,1);
+  --disp:'Inter',-apple-system,'SF Pro Display','Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior-y:none}
+body{color:var(--txt);font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh;
+ background:#0C1018;background-image:radial-gradient(120% 55% at 50% -8%,rgba(59,130,255,.13),transparent 60%),linear-gradient(180deg,#161E2D 0%,#0F1522 45%,#0B0F18 100%);background-attachment:fixed}
+button{font:inherit;background:none;border:none;color:inherit;cursor:pointer;touch-action:manipulation}
+.mono{font-family:var(--mono);font-size:11.5px;letter-spacing:1px;text-transform:uppercase}
+.disp{font-family:var(--disp);font-weight:800;letter-spacing:-.02em}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s;animation-timing-function:var(--easeo)}
+/* — tacte orgànic — */
+.btn,.fx,.fnav,.frirrow button,.chip.tap,.oline,.pbtn,.undochip,nav.tabs button,.acc2>button,.stat,.witem{transition:transform .45s var(--spring),filter .25s ease,background .25s ease,box-shadow .3s ease}
+.btn:active,.fx:active,.fnav:active,.frirrow button:active,.chip.tap:active,.oline:active,.pbtn:active,.undochip:active,nav.tabs button:active,.acc2>button:active{transform:scale(.96);filter:brightness(1.25)}
+.glass{background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--sh1)}
+.wrap{max-width:520px;margin:0 auto;padding:0 18px 128px;position:relative;z-index:1}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top)) 2px 14px}
+.card{background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:22px;margin-bottom:16px;box-shadow:var(--sh1)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:16px;padding:17px;font-family:var(--mono);font-size:13px;letter-spacing:2px;text-transform:uppercase;min-height:54px}
+.btn-acc{background:var(--acc);color:#fff;box-shadow:var(--shacc)}
+.btn-ink{background:rgba(10,15,26,.85);color:var(--acc);box-shadow:var(--sh1)}
+.btn-ghost{border:1.5px dashed rgba(110,125,150,.45);color:#5d6b80;font-size:12px;letter-spacing:1px}
+.btn-line{background:var(--surf);color:var(--mut);font-size:12px;letter-spacing:1px;box-shadow:var(--sh1)}
+.btn-soft{background:var(--accso);color:var(--txt);font-size:12px;letter-spacing:1px;margin-top:10px;box-shadow:var(--sh1)}
+.btn[disabled]{background:var(--surf);color:var(--mut);box-shadow:none}
+.coach{border-left:3px solid var(--acc)}
+.coach .cm{font-size:13.5px;margin-top:9px;line-height:1.55}
+.coach .cm.warn{color:var(--warn)}.coach .cm.red{color:var(--bad)}.coach .cm.sage{color:var(--ok)}.coach .cm.hold{color:var(--txt)}
+.strip{background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:12px;margin-bottom:16px;box-shadow:var(--sh1)}
+.sprk{display:flex;justify-content:space-between;padding:0 4px}
+.sprk i{width:5px;height:5px;border-radius:2px;background:rgba(160,180,210,.18)}
+.frames{display:flex;gap:5px;margin:8px 0}
+.frame{flex:1;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surf);border-radius:10px;font-family:var(--mono)}
+.frame b{font-size:13px;color:var(--mut);font-weight:600}
+.frame small{font-size:8.5px;color:var(--mut)}
+.frame.done{background:var(--surf2)}.frame.done b{color:var(--acc)}
+.frame.cur{background:var(--paper);box-shadow:var(--sh2)}
+.frame.cur b,.frame.cur small{color:var(--ptxt)}
+.frame.rest{opacity:.55}.frame.rest.cur{opacity:1}
+.sheet{background:var(--paper);color:var(--ptxt);border-radius:26px;overflow:hidden;margin-bottom:16px;animation:rise .5s var(--spring) both;box-shadow:var(--sh2)}
+.sheet .bar{display:flex;justify-content:space-between;background:var(--ptxt);padding:11px 20px}
+.sheet .bar .mono{color:var(--paper)}.sheet .bar .mono.a{color:#7db1ff}
+.sheet .body{padding:24px;display:flex;gap:12px}
+.sheet h1{font-family:var(--disp);font-size:36px;line-height:1.05;font-weight:800;letter-spacing:-1px}
+.sheet .sub{color:#3c4654;font-size:14.5px;margin-top:8px;line-height:1.5}
+.sheet .meta{display:flex;gap:14px;margin-top:12px;font-family:var(--mono);font-size:11px;color:#67748a;flex-wrap:wrap}
+.sheet .eyebrow{color:#67748a}
+.calm{background:#e7ecf4;color:#3c4654;border-radius:14px;padding:14px;font-size:13.5px;margin-top:10px;line-height:1.5}
+.anat{flex-shrink:0;display:flex;gap:2px;align-items:center}
+.anat svg{display:block}
+.anat .bod{fill:#d8dfe9;stroke:#b3bfd0;stroke-width:.8}
+.anat .mus{fill:#c7d1df;opacity:.5;transition:opacity .3s}
+.anat .mus.on{fill:var(--acc);opacity:.95;filter:drop-shadow(0 0 3px rgba(59,130,255,.7))}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:20px;padding:18px 10px;text-align:center;box-shadow:var(--sh1)}
+.stat b{font-family:var(--mono);font-size:24px;font-weight:600;display:block}
+.stat span{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+/* ===== FOCUS ===== */
+.focus{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;background:inherit;background-color:#0C1018;background-image:radial-gradient(120% 55% at 50% -8%,rgba(59,130,255,.13),transparent 60%),linear-gradient(180deg,#161E2D 0%,#0F1522 45%,#0B0F18 100%);animation:fadein .2s ease-out both}
+.fhead{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 18px 10px}
+.fhead .fx{width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--mut);border-radius:16px;background:var(--surf);box-shadow:var(--sh1)}
+.fprog{flex:1}
+.fprog .ft{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);text-align:center}
+.fbar{height:5px;background:var(--surf);border-radius:3px;margin-top:7px;overflow:hidden}
+.fbar i{display:block;height:100%;background:var(--acc);border-radius:3px;transition:width .5s var(--easeo)}
+.fbody{flex:1;overflow-y:auto;padding:8px 20px 16px;display:flex;flex-direction:column}
+.fexrow{display:flex;gap:14px;align-items:center}
+.fexname{font-size:21px;font-weight:800;line-height:1.3;flex:1;letter-spacing:-.3px}
+.fig{flex-shrink:0;width:98px;height:98px;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:24px;box-shadow:var(--sh1)}
+.fig svg{display:block}
+.fig .bone{stroke:var(--paper);stroke-width:4;stroke-linecap:round;fill:none}
+.fig .bhead{fill:var(--paper)}
+.fig .prop{stroke:#42597f;stroke-width:3;stroke-linecap:round}
+.fdo{margin-top:14px;background:rgba(10,15,26,.8);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:16px;padding:14px 16px;font-size:15px;color:#7db1ff;display:flex;gap:10px;align-items:baseline;font-weight:600;box-shadow:var(--sh1)}
+.fdo .mono{font-size:9.5px;color:var(--mut);flex-shrink:0;font-weight:400}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;background:var(--surf);border-radius:11px;padding:9px 13px;color:var(--mut);min-height:36px;display:flex;align-items:center}
+.chip.tap{color:#7db1ff;background:var(--accso)}
+.fset{margin-top:16px;text-align:center}
+.fset .sl{font-family:var(--mono);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--txt)}
+.fset .side{color:#7db1ff;font-weight:700}
+.fset .edited{display:block;margin-top:7px;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--ok);text-transform:uppercase}
+.undochip{margin-left:8px;background:var(--surf);border-radius:9px;padding:6px 11px;font-family:var(--mono);font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:.5px}
+/* onada */
+.wave{position:relative;margin:14px -4px 0;height:192px}
+.wave svg{display:block;width:100%;height:160px}
+.wave .wpath{fill:none;stroke:rgba(59,130,255,.32);stroke-width:3.5}
+.wave .wball{fill:var(--acc);filter:drop-shadow(0 0 8px rgba(59,130,255,.9))}
+.wave .wlane{stroke:var(--hair);stroke-width:1;stroke-dasharray:3 6}
+.wave.glow .wball{fill:#8fc0ff;filter:drop-shadow(0 0 14px rgba(143,192,255,1))}
+.wcount{position:absolute;top:0;right:8px;font-family:var(--mono);font-size:46px;font-weight:600;line-height:1;color:var(--paper);text-align:right}
+.wcount small{font-size:11px;font-weight:400;color:var(--mut);letter-spacing:1px;display:block;margin-top:3px}
+.wph{position:absolute;top:6px;left:8px;font-family:var(--mono);font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut)}
+.wave.glow .wph{color:#8fc0ff}
+.wave.run .wph{color:var(--acc)}
+.pbtn{margin:4px auto 0;display:block;background:var(--accso);color:#7db1ff;border-radius:16px;padding:15px 28px;font-family:var(--mono);font-size:12.5px;letter-spacing:2px;text-transform:uppercase;min-height:54px;box-shadow:var(--sh1)}
+/* rodes */
+.fwheels{display:flex;gap:14px;justify-content:center;margin-top:18px}
+.wcol{flex:1;max-width:164px}
+.wlab{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);text-align:center;margin-bottom:8px}
+.wbox{position:relative;height:168px;border-radius:20px;overflow:hidden;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--sh1)}
+.wheel{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent)}
+.wheel::-webkit-scrollbar{display:none}
+.witem{height:56px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:26px;color:var(--mut)}
+.wpad{height:56px}
+.wsel{position:absolute;left:12px;right:12px;top:56px;height:56px;border-top:1.5px solid var(--accbr);border-bottom:1.5px solid var(--accbr);pointer-events:none;border-radius:2px}
+/* RIR */
+.frir{margin-top:18px}
+.frir .rl{font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);text-align:center;margin-bottom:10px;line-height:1.6}
+.frirrow{display:flex;gap:10px}
+.frirrow button{flex:1;height:68px;border-radius:18px;background:var(--surf2);font-family:var(--mono);font-size:19px;font-weight:600;color:var(--txt);box-shadow:var(--sh1)}
+.frirrow button:active{background:var(--acc);color:#fff}
+.frirrow small{display:block;font-size:9px;color:var(--mut);font-weight:400;letter-spacing:.5px}
+.ffoot{display:flex;gap:10px;padding:10px 18px calc(14px + env(safe-area-inset-bottom))}
+.fnav{flex:1;height:56px;border-radius:16px;background:var(--surf);color:var(--mut);font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;box-shadow:var(--sh1)}
+/* descans */
+.restwrap{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(9,13,21,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:fadein .2s both;padding:22px}
+.rring{position:relative;width:252px;height:252px}
+.rring svg{transform:rotate(-90deg)}
+.rring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:10}
+.rring-fg{fill:none;stroke:var(--acc);stroke-width:10;stroke-linecap:round}
+.rnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rnum b{font-family:var(--mono);font-size:62px;line-height:1;font-weight:600;color:var(--paper)}
+.rnum span{font-family:var(--mono);font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-top:7px}
+.rnext{margin-top:24px;text-align:center}
+.rnext .nl{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.rnext .nv{font-size:18px;font-weight:700;color:#7db1ff;margin-top:6px;max-width:320px;letter-spacing:-.2px}
+.rbtns{display:flex;gap:10px;margin-top:28px;width:100%;max-width:380px}
+.restwrap.fi .rnum b{color:var(--acc)}
+/* overlays */
+.over{position:fixed;inset:0;z-index:50;background:rgba(6,9,15,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;animation:fadein .15s both}
+.osheet{width:100%;max-height:78vh;overflow-y:auto;border-radius:26px 26px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:var(--sh2)}
+.oline{display:flex;align-items:center;gap:12px;padding:15px 6px;border-bottom:1px solid var(--hair);min-height:56px;border-radius:10px}
+.oline .n{flex:1;font-size:15px}
+.oline .st{font-family:var(--mono);font-size:11px;color:var(--mut)}
+.oline.cur .n{color:#7db1ff;font-weight:700}
+.plrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:14px;padding:12px 4px;border-bottom:1px solid var(--hair)}
+.sumwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;animation:rise .5s var(--spring) both}
+.stamp{border:1.5px solid var(--accbr);color:#7db1ff;border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left;margin-top:10px;animation:stamp .45s var(--spring) both;background:var(--accso);box-shadow:var(--sh1)}
+select.sel{width:100%;background:var(--glassbg);color:var(--txt);border:none;border-radius:16px;padding:16px;font-family:var(--mono);font-size:13px;margin-bottom:14px;min-height:52px;box-shadow:var(--sh1)}
+.hrow{display:flex;gap:10px;align-items:center;background:var(--surf);border-radius:14px;padding:13px;margin-bottom:8px}
+.hrow .d{font-family:var(--mono);font-size:11px;color:var(--mut);width:40px}
+.hrow .s{font-family:var(--mono);font-size:12px;flex:1}
+.acc-c{color:#7db1ff}
+.acc2{background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;margin-bottom:12px;overflow:hidden;box-shadow:var(--sh1)}
+.acc2>button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:18px;text-align:left;min-height:58px}
+.acc2 .ti{font-family:var(--disp);font-size:17px;font-weight:700;color:var(--paper);letter-spacing:-.2px}
+.acc2 .fo{display:block;font-family:var(--mono);font-size:9.5px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+.accbody{padding:0 18px 16px}
+.exline{padding:10px 0;border-top:1px solid var(--hair);font-size:13px}
+.exline .r1{display:flex;gap:8px}
+.exline .n{flex:1}
+.exline .t{font-family:var(--mono);font-size:10.5px;color:var(--mut)}
+.exline .tech{margin-top:5px;font-size:12px;color:var(--mut);line-height:1.55}
+ol.rules{padding-left:18px;margin-top:10px;font-size:13.5px;display:grid;gap:9px;line-height:1.5}
+.tech{font-size:13px;color:var(--mut);margin-top:10px;line-height:1.6}
+.sug{margin-top:8px;font-size:13px;line-height:1.5}
+.sug.up{color:var(--ok)}.sug.warn{color:var(--warn)}.sug.down{color:var(--bad)}.sug.hold,.sug.info{color:var(--mut)}
+.last{font-family:var(--mono);font-size:10.5px;color:var(--mut);margin-top:9px;letter-spacing:.5px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 -10px 30px rgba(0,0,0,.4);padding-bottom:env(safe-area-inset-bottom);z-index:16}
+nav.tabs button{flex:1;padding:12px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);min-height:56px}
+nav.tabs button.on{color:var(--acc)}
+nav.tabs .ic{font-size:17px;line-height:1}
+.mut{color:var(--mut)}.ok{color:var(--ok)}
+.empty{color:var(--mut);font-size:13px;text-align:center;padding:36px 12px}
+/* v7: anell setmanal, PR, ajustos, onboarding */
+.wring{position:relative;width:56px;height:56px;margin:0 auto 6px}
+.wring svg{transform:rotate(-90deg)}
+.wring-bg{fill:none;stroke:rgba(255,255,255,.09);stroke-width:5}
+.wring-fg{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round}
+.wring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:600}
+.fig-s{width:86px;height:86px;margin:12px auto 2px;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;box-shadow:var(--sh1)}
+.fig-s .bone{stroke:var(--paper);stroke-width:4;stroke-linecap:round;fill:none}
+.fig-s .bhead{fill:var(--paper)}
+.fig-s .prop{stroke:#42597f;stroke-width:3;stroke-linecap:round}
+.prbadge{font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#FFD66B;background:rgba(255,193,77,.14);padding:11px 18px;border-radius:14px;margin-bottom:16px;box-shadow:var(--sh1);animation:stamp .45s var(--spring) both}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 4px;border-bottom:1px solid var(--hair);font-size:14.5px;min-height:58px}
+.sw{width:50px;height:30px;border-radius:15px;background:rgba(255,255,255,.14);position:relative;transition:background .25s;flex-shrink:0}
+.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:12px;background:#fff;transition:transform .4s var(--spring);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.sw.on{background:var(--acc)}
+.sw.on i{transform:translateX(20px)}
+nav.tabs .ic{display:flex;align-items:center;justify-content:center;height:20px}
+nav.tabs button.on .ic{transform:scale(1.12);transition:transform .4s var(--spring)}
+.obdot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.18)}
+.obdot.on{background:var(--acc)}
+/* —— Mòdul 1: jerarquia visual de l'entreno —— */
+.hero{display:flex;gap:16px;align-items:center;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:26px;padding:18px;margin-top:6px;box-shadow:var(--sh1)}
+.fig-h{width:128px;height:128px;border-radius:26px;flex-shrink:0}
+.hcol{flex:1;min-width:0}
+.heyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut)}
+.hname{font-size:21px;font-weight:800;line-height:1.25;letter-spacing:-.4px;margin-top:6px}
+.fdo-mini{margin-top:10px;padding:9px 12px;font-size:13px;border-radius:12px;box-shadow:none;background:rgba(10,15,26,.65)}
+.fdo-mini .mono{font-size:8.5px}
+.bigstats{display:flex;gap:12px;margin-top:14px}
+.bstat{flex:1;background:var(--glassbg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:16px 12px;text-align:center;box-shadow:var(--sh1)}
+.bstat .bl{font-family:var(--mono);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
+.bstat .bv{font-family:var(--mono);font-size:40px;font-weight:600;line-height:1;margin-top:8px;color:var(--paper)}
+.bstat .bv small{font-size:15px;color:var(--mut);font-weight:400}
+.sidepill{margin-top:12px;background:var(--accso);color:#8fc0ff;border-radius:14px;padding:13px;text-align:center;font-weight:700;font-size:15px;letter-spacing:.3px;box-shadow:var(--sh1)}
+.chips-c{justify-content:center;margin-top:14px}
+.rise{animation:rise .5s var(--spring) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes stamp{from{opacity:0;transform:scale(1.18) rotate(-2deg)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="empty" style="padding-top:45vh">Carregant el protocol…</div></div>
+<input type="file" id="impfile" accept=".json,application/json" style="display:none">
+<script>
+/* ================= EL PLA (v2) ================= */
+const SESSIONS={
+ PUSH_A:{name:"PUSH A",focus:"Pit · Espatlles ★ · Tríceps · Bessons",dur:"50–60 min",ex:[
+  {id:"pa1",fig:"pushup",name:"Flexions inclinades (caixó 30 cm)",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"baixa l'alçada → planes → declinades → xaleco",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Mans al caixó, cos en línia recta del cap als talons. Baixa el pit fins a fregar (2 s) i empeny amb intenció."},
+  {id:"pa2",fig:"dip",name:"Fondos a paral·leles (tors endavant)",sets:3,rep:[6,10],load:"PC + xaleco",prog:"vest",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Inclina el tors endavant per carregar el pit. Colzes ~45°, baixa fins a notar stretch sense dolor d'espatlla."},
+  {id:"pa3",fig:"ohp",name:"Press militar DB assegut",sets:3,rep:[8,12],load:"DB",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Lumbar neutra contra el respatller, colzes lleugerament per davant del cos. Puja sense bloquejar a dalt."},
+  {id:"pa4",fig:"latraise",name:"Elevacions laterals DB",sets:4,rep:[12,15],load:"DB lleuger",prog:"lateral",star:1,rest:90,tempo:"2-1-2",rirT:"RIR 1 · últ. a 0 opc.",tech:"Braços quasi rectes, lidera amb els colzes fins a l'horitzontal. Pausa 1 s a dalt, baixa en 2 s. Forma > càrrega."},
+  {id:"pa5",fig:"triext",name:"Tríceps overhead DB (2 mans)",sets:3,rep:[10,12],load:"DB",prog:"kg",rest:90,tempo:"2-0-1",rirT:"RIR 1",tech:"DB amb les dues mans darrere el cap, colzes tancats i quiets. Stretch profund a baix: és el que fa créixer el cap llarg."},
+  {id:"pa6",fig:"facepull",name:"Face pull amb banda",sets:3,rep:[12,15],load:"Lleuger",prog:"kg",rest:90,tempo:"2-1-2",rirT:"RIR 2 (tècnic)",tech:"Tira cap a la cara separant les mans, acaba amb rotació externa i escàpules juntes. Salut d'espatlla: no cal fallar."},
+  {id:"pa7",fig:"calf",name:"Bessons · unilateral a l'esgraó",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Taló cau per sota de l'esgraó (stretch màxim), puja fins a la punta i pausa 1 s a dalt. Tot el rang, sempre."}]},
+ PULL_A:{name:"PULL A",focus:"Esquena vertical ★ · Bíceps · Core",dur:"50–60 min",ex:[
+  {id:"ua1",fig:"pullup",name:"Dominades (Power Tower)",sets:3,rep:[5,8],load:"PC + xaleco",prog:"pullup",star:1,rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Penjat complet a baix, pit cap a la barra, sense impuls. Baixa controlat 2 s. Si <3×5: negatives de 5 s."},
+  {id:"ua2",fig:"australian",name:"Australian pull-ups",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"barra més baixa o xaleco",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Cos rígid en planxa. Tira el pit a la barra ajuntant escàpules. Alterna pronació/supinació entre sessions."},
+  {id:"ua3",fig:"row45",name:"Rem amb barra inclinat 45°",sets:3,rep:[8,12],load:"Barra",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Tors a 45°, lumbar neutra sempre. Tira la barra cap al melic i controla la baixada 2 s."},
+  {id:"ua4",fig:"curl",name:"Curl bíceps DB alternat (supinació)",sets:3,rep:[10,12],load:"DB",prog:"kg",rest:90,tempo:"2-0-1",rirT:"RIR 1",tech:"Colze fix al costat del cos. Supina el canell mentre puges. Baixa 2 s, zero balanceig."},
+  {id:"ua5",fig:"curl",name:"Curl martell DB",sets:2,rep:[12,15],load:"DB",prog:"kg",rest:90,tempo:"2-0-1",rirT:"RIR 1",tech:"Agafada neutra (polzes amunt), colzes quiets. Braquial i braquioradial: el gruix del braç."},
+  {id:"ua6",fig:"legraise",name:"Core · elevació de cames",sets:3,rep:[10,12],load:"PC",prog:"ladder",ladder:"cames rectes → amb rotació",rest:75,tempo:"2-0-2",rirT:"RIR 1–2",tech:"Sense balanceig: al final del recorregut bascula la pelvis amunt. Baixa les cames en 2 s sense arquejar la lumbar."}]},
+ LEGS_A:{name:"LEGS A",focus:"Quàdriceps ★ · Isquios · Gluti · Bessons",dur:"55–65 min",ex:[
+  {id:"ka1",fig:"squat",name:"Sentadilla amb xaleco",sets:3,rep:[8,12],load:"Xaleco 20 kg",prog:"vest",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peus a l'ample d'espatlles, baixa profund (2 s) amb el tors ferm i empeny amb tot el peu."},
+  {id:"ka2",fig:"split",name:"Bulgarian split squat DB",sets:3,rep:[8,10],load:"DB",prog:"kg",star:1,side:"cama",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peu del darrere al banc. Baixa vertical, genoll davanter alineat sobre el peu. DB a les mans."},
+  {id:"ka3",fig:"rdl",name:"Romanian deadlift amb barra",sets:3,rep:[8,12],load:"Barra",prog:"kg",rest:150,tempo:"3-0-1",rirT:"RIR 2",tech:"Frontissa de maluc: barra arran de cames, descens de 3 s fins a stretch màxim d'isquios. Lumbar neutra SEMPRE."},
+  {id:"ka4",fig:"bridge",name:"Glute bridge amb barra",sets:3,rep:[12,15],load:"Barra",prog:"kg",rest:90,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Empeny amb els talons, bloqueja el gluti amb pausa d'1 s a dalt. No arquegis la lumbar per pujar més."},
+  {id:"ka5",fig:"calf",name:"Bessons · unilateral stretch",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Stretch màxim a baix, puja a la punta, pausa 1 s a dalt. Quan superis 4×15 net: DB a la mà lliure."},
+  {id:"ka6",fig:"calf",name:"Bessons · bilateral lent",sets:2,rep:[20,25],load:"PC",prog:"none",rest:75,tempo:"3-2-1",rirT:"fins a cremar",tech:"Tot lent: 3 s baixar, 2 s aguantant l'stretch a baix, 1 s pujar. Bomba final fins a cremar."}]},
+ PUSH_B:{name:"PUSH B",focus:"Pit · Espatlles ★ · Tríceps · Core",dur:"50–60 min",ex:[
+  {id:"pb1",fig:"pushup",name:"Flexions declinades amb handles",sets:3,rep:[8,12],load:"PC + xaleco",prog:"vest",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peus elevats, handles per guanyar rang. Baixa el pit entre les mans en 2 s. Èmfasi al pit superior."},
+  {id:"pb2",fig:"bench",name:"Press DB al banc (horitzontal)",sets:3,rep:[8,12],load:"DB",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Escàpules enrere i clavades al banc. Baixa els DB als costats del pit i empeny ajuntant-los a dalt."},
+  {id:"pb3",fig:"ohp",name:"Arnold press DB",sets:3,rep:[8,12],load:"DB",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Comença amb els palmells cap a tu i rota fins al press complet. Deltoide frontal + lateral alhora."},
+  {id:"pb4",fig:"latraise",name:"Laterals lean-away unilateral",sets:4,rep:[10,12],load:"DB lleuger",prog:"lateral",star:1,side:"braç",rest:90,tempo:"2-1-2",rirT:"RIR 1 · últ. a 0 opc.",tech:"Agafat a la torre amb el cos inclinat enfora: més tensió al final del rang. Pausa 1 s a dalt."},
+  {id:"pb5",fig:"pushup",name:"Flexions diamant o dips curts",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"xaleco o palanca més dura",rest:90,tempo:"2-0-1",rirT:"RIR 1",tech:"Mans juntes sota el pit formant un diamant, colzes enganxats al cos. Cap lateral del tríceps."},
+  {id:"pb6",fig:"deadbug",name:"Core · dead bug",sets:3,rep:[10,12],load:"—",prog:"none",side:"costat",rest:75,tempo:"lent",rirT:"qualitat > reps",tech:"Lumbar enganxada a terra tota l'estona. Estén braç i cama oposats lentament mentre exhales."}]},
+ PULL_B:{name:"PULL B",focus:"Esquena horitzontal · Rear delts ★ · Bíceps · Bessons",dur:"50–60 min",ex:[
+  {id:"ub1",fig:"row1",name:"Rem DB a 1 braç (al banc)",sets:3,rep:[10,12],load:"DB",prog:"kg",side:"braç",rest:150,tempo:"2-1-1",rirT:"RIR 2",tech:"Mà i genoll al banc, esquena plana. Tira el DB cap al maluc amb rang màxim i pausa 1 s a dalt."},
+  {id:"ub2",fig:"pullup",name:"Dominades neutres o supinades",sets:3,rep:[5,8],load:"PC + xaleco",prog:"pullup",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Agafada neutra o supinada: més bíceps. Pit a la barra, penjat complet a baix, baixada de 2 s."},
+  {id:"ub3",fig:"australian",name:"Australian amb peus elevats",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"cos més horitzontal → xaleco",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peus al banc: com més horitzontal el cos, més dur. Pit a la barra, cos rígid."},
+  {id:"ub4",fig:"rearfly",name:"Rear delt flies (banc inclinat)",sets:4,rep:[12,15],load:"DB lleuger",prog:"kg",star:1,rest:90,tempo:"2-1-2",rirT:"RIR 1 · últ. a 0 opc.",tech:"Pit recolzat al banc inclinat. Obre els braços liderant amb els colzes, pausa 1 s a dalt. Pes < forma."},
+  {id:"ub5",fig:"curl",name:"Curl bíceps concentrat",sets:3,rep:[10,12],load:"DB",prog:"kg",side:"braç",rest:90,tempo:"2-0-1",rirT:"RIR 1 · últ. a 0",tech:"Colze contra la part interna de la cuixa. Puja sense moure el braç, baixa en 2 s. Aïllament pur."},
+  {id:"ub6",fig:"calf",name:"Bessons · unilateral",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Tercera sessió de bessons de la setmana. Stretch màxim a baix, pausa 1 s a la punta."}]},
+ LEGS_B:{name:"LEGS B",focus:"Isquios ★ · Gluti · Quàdriceps · Core · Bessons",dur:"60–70 min",ex:[
+  {id:"kb1",fig:"rdl",name:"RDL unilateral amb DB",sets:3,rep:[8,10],load:"DB",prog:"kg",side:"cama",rest:150,tempo:"3-0-1",rirT:"RIR 2",tech:"Frontissa sobre una cama, maluc quadrat (no s'obre). Descens de 3 s fins a stretch d'isquios, esquena neutra."},
+  {id:"kb2",fig:"squat",name:"Sentadilla goblet DB",sets:3,rep:[10,12],load:"DB",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"DB agafat al pit. Baixa profund entre els genolls amb el tors vertical. Menys lumbar que la de dimecres."},
+  {id:"kb3",fig:"split",name:"Bulgarian amb pausa 2 s",sets:3,rep:[8,10],load:"DB o xaleco",prog:"kg",side:"cama",rest:150,tempo:"2-2-1",rirT:"RIR 2",tech:"Com el de dimecres però amb pausa de 2 s a baix: més estímul amb menys càrrega."},
+  {id:"kb4",fig:"thrust",name:"Hip thrust al banc amb barra",sets:3,rep:[10,15],load:"Barra",prog:"kg",rest:120,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Esquena alta recolzada al banc. Empeny amb talons fins a extensió completa de maluc, pausa 1 s a dalt."},
+  {id:"kb5",fig:"legcurl",name:"Leg curl lliscant · NOU v2",sets:3,rep:[6,10],load:"PC",prog:"ladder",star:1,ladder:"2 cames → només eccèntrica → 1 cama → nòrdic negatiu",rest:90,tempo:"3-0-1",rirT:"RIR 1",tech:"Pont de gluti amb talons sobre tovallola/sliders. Llisca els talons enfora en 3 s i recull. Maluc alt tota l'estona."},
+  {id:"kb6",fig:"hollow",name:"Core · hollow body hold",sets:3,rep:[20,40],load:"—",prog:"time",time:1,rest:75,tempo:"isomètric",rirT:"para abans de perdre forma",tech:"Lumbar enganxada a terra, braços i cames esteses. Si la lumbar s'aixeca, plega una mica les cames."},
+  {id:"kb7",fig:"calf",name:"Bessons · unilateral",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Quarta sessió de bessons: stretch màxim a baix, pausa 1 s a la punta."},
+  {id:"kb8",fig:"calf",name:"Bessons · bilateral lent",sets:2,rep:[20,25],load:"PC",prog:"none",rest:75,tempo:"3-2-1",rirT:"fins a cremar",tech:"3 s baixar, 2 s a baix en stretch, 1 s pujar. L'última crema de la setmana."}]}
+};
+const CYCLE=["PUSH_A","PULL_A","LEGS_A","REST","PUSH_B","PULL_B","LEGS_B","REST"];
+const ALL_EX=Object.values(SESSIONS).flatMap(s=>s.ex);
+const EX=id=>ALL_EX.find(e=>e.id===id);
+
+/* ===== Figures de pals (NO TOCAR: coordenades i lògica intactes) ===== */
+const FIG={
+ pushup:{p:[[8,84,92,84]],A:{h:[80,50],n:[72,56],hp:[48,62],k:[36,66],a:[22,72],f:[16,76],e:[72,70],ha:[70,82]},B:{h:[80,64],n:[72,68],hp:[48,72],k:[36,75],a:[22,79],f:[16,82],e:[60,77],ha:[70,82]}},
+ dip:{p:[[24,42,36,42],[64,42,76,42]],A:{h:[50,14],n:[50,25],hp:[50,52],k:[45,67],a:[50,80],f:[57,83],e:[60,34],ha:[66,42]},B:{h:[52,26],n:[52,37],hp:[52,62],k:[47,76],a:[52,88],f:[59,90],e:[68,40],ha:[66,42]}},
+ ohp:{p:[[30,64,54,64],[36,64,36,90]],A:{h:[44,22],n:[44,30],hp:[44,62],k:[58,64],a:[58,86],f:[66,86],e:[46,20],ha:[47,9]},B:{h:[44,22],n:[44,30],hp:[44,62],k:[58,64],a:[58,86],f:[66,86],e:[53,35],ha:[50,27]}},
+ bench:{p:[[20,72,72,72],[24,72,24,90],[66,72,66,90]],A:{h:[26,64],n:[33,67],hp:[55,67],k:[64,76],a:[64,90],f:[71,90],e:[37,52],ha:[39,40]},B:{h:[26,64],n:[33,67],hp:[55,67],k:[64,76],a:[64,90],f:[71,90],e:[45,63],ha:[40,57]}},
+ latraise:{A:{h:[50,13],n:[50,22],hp:[50,50],k:[50,70],a:[50,90],f:[58,90],e:[65,23],ha:[78,21]},B:{h:[50,13],n:[50,22],hp:[50,50],k:[50,70],a:[50,90],f:[58,90],e:[57,34],ha:[59,47]}},
+ triext:{A:{h:[48,16],n:[48,24],hp:[48,52],k:[48,72],a:[48,90],f:[56,90],e:[54,16],ha:[56,5]},B:{h:[48,16],n:[48,24],hp:[48,52],k:[48,72],a:[48,90],f:[56,90],e:[54,16],ha:[43,20]}},
+ facepull:{p:[[80,28,88,28]],A:{h:[48,16],n:[48,24],hp:[48,52],k:[48,72],a:[48,90],f:[56,90],e:[56,25],ha:[51,22]},B:{h:[48,16],n:[48,24],hp:[48,52],k:[48,72],a:[48,90],f:[56,90],e:[63,30],ha:[75,28]}},
+ calf:{p:[[38,86,66,86],[40,86,40,92],[64,86,64,92]],A:{h:[50,4],n:[50,12],hp:[50,38],k:[50,58],a:[48,76],f:[55,82],e:[44,24],ha:[44,36]},B:{h:[50,12],n:[50,20],hp:[50,46],k:[50,66],a:[48,90],f:[55,83],e:[44,32],ha:[44,44]}},
+ pullup:{p:[[28,10,76,10]],A:{h:[50,21],n:[50,29],hp:[50,53],k:[48,67],a:[52,79],f:[58,81],e:[60,19],ha:[58,10]},B:{h:[50,33],n:[50,41],hp:[50,65],k:[48,79],a:[52,90],f:[58,92],e:[55,26],ha:[58,10]}},
+ australian:{p:[[28,44,76,44]],A:{h:[34,38],n:[40,43],hp:[57,62],k:[65,72],a:[74,85],f:[80,88],e:[47,40],ha:[44,44]},B:{h:[27,52],n:[34,55],hp:[54,70],k:[64,78],a:[74,85],f:[80,88],e:[40,51],ha:[44,44]}},
+ row45:{A:{h:[68,34],n:[64,38],hp:[48,54],k:[50,72],a:[50,90],f:[58,90],e:[59,45],ha:[57,51]},B:{h:[68,34],n:[64,38],hp:[48,54],k:[50,72],a:[50,90],f:[58,90],e:[63,52],ha:[63,64]}},
+ row1:{p:[[24,70,56,70],[28,70,28,90],[52,70,52,90]],A:{h:[24,40],n:[32,44],hp:[58,51],k:[64,65],a:[64,88],f:[71,88],e2:[36,55],ha2:[33,68],e:[48,52],ha:[48,58]},B:{h:[24,40],n:[32,44],hp:[58,51],k:[64,65],a:[64,88],f:[71,88],e2:[36,55],ha2:[33,68],e:[46,60],ha:[46,73]}},
+ curl:{A:{h:[48,14],n:[48,22],hp:[48,50],k:[48,70],a:[48,90],f:[56,90],e:[55,36],ha:[50,23]},B:{h:[48,14],n:[48,22],hp:[48,50],k:[48,70],a:[48,90],f:[56,90],e:[55,36],ha:[57,51]}},
+ legraise:{p:[[28,10,76,10]],A:{h:[50,24],n:[50,32],hp:[50,57],k:[62,53],a:[74,51],f:[80,51],e:[56,21],ha:[58,10]},B:{h:[50,24],n:[50,32],hp:[50,57],k:[50,72],a:[50,86],f:[56,89],e:[56,21],ha:[58,10]}},
+ squat:{A:{h:[50,16],n:[50,25],hp:[50,52],k:[50,72],a:[50,90],f:[59,90],e:[57,36],ha:[62,30]},B:{h:[54,37],n:[53,45],hp:[43,63],k:[57,74],a:[51,90],f:[60,90],e:[64,50],ha:[70,45]}},
+ split:{p:[[64,76,86,76],[66,76,66,90],[84,76,84,90]],A:{h:[43,18],n:[43,27],hp:[45,53],k:[43,71],a:[43,90],f:[51,90],k2:[57,63],a2:[68,74],f2:[76,76],e:[39,40],ha:[39,51]},B:{h:[46,32],n:[46,41],hp:[48,62],k:[41,76],a:[43,90],f:[51,90],k2:[60,72],a2:[68,76],f2:[76,76],e:[42,53],ha:[42,63]}},
+ rdl:{A:{h:[50,14],n:[50,23],hp:[50,52],k:[50,72],a:[50,90],f:[58,90],e:[51,38],ha:[51,52]},B:{h:[71,37],n:[66,41],hp:[47,52],k:[50,72],a:[50,90],f:[58,90],e:[62,52],ha:[60,67]}},
+ bridge:{A:{h:[18,84],n:[25,81],hp:[49,65],k:[61,63],a:[69,86],f:[77,86],e:[33,88],ha:[40,88]},B:{h:[18,84],n:[25,84],hp:[47,84],k:[60,72],a:[69,86],f:[77,86],e:[33,88],ha:[40,88]}},
+ thrust:{p:[[8,74,30,74],[10,74,10,90],[28,74,28,90]],A:{h:[16,64],n:[24,68],hp:[50,61],k:[62,61],a:[69,88],f:[77,88],e:[32,72],ha:[40,68]},B:{h:[16,68],n:[24,72],hp:[46,82],k:[60,72],a:[69,88],f:[77,88],e:[32,78],ha:[40,80]}},
+ legcurl:{A:{h:[16,84],n:[23,81],hp:[42,68],k:[54,66],a:[61,84],f:[69,84],e:[30,88],ha:[36,88]},B:{h:[16,84],n:[23,82],hp:[40,73],k:[58,75],a:[76,82],f:[84,82],e:[30,88],ha:[36,88]}},
+ hollow:{A:{h:[23,71],n:[29,74],hp:[50,80],k:[62,74],a:[74,68],f:[80,66],e:[15,66],ha:[8,60]},B:{h:[23,74],n:[29,76],hp:[50,81],k:[62,76],a:[74,72],f:[80,70],e:[15,69],ha:[8,64]}},
+ deadbug:{A:{h:[20,82],n:[27,82],hp:[50,82],k:[56,68],a:[63,60],f:[68,57],e:[29,70],ha:[29,58],k2:[58,75],a2:[66,81],f2:[72,81],e2:[34,86],ha2:[40,86]},B:{h:[20,82],n:[27,82],hp:[50,82],k:[63,76],a:[75,74],f:[81,73],e:[19,77],ha:[11,73],k2:[58,75],a2:[66,81],f2:[72,81],e2:[34,86],ha2:[40,86]}}
+};
+const BONES=[["n","hp"],["hp","k"],["k","a"],["a","f"],["n","e"],["e","ha"],["hp","k2"],["k2","a2"],["a2","f2"],["n","e2"],["e2","ha2"]];
+
+/* ================= Persistència ================= */
+const KEY="hp_companion_v1";
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const fmtD=iso=>{const d=new Date(iso+"T12:00:00");return d.getDate()+"/"+(d.getMonth()+1)};
+const fmtT=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const daysBetween=(a,b)=>Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5);
+const fresh=()=>({v:7,cycleIndex:0,startDate:todayISO(),lastDeload:todayISO(),deloadUntil:null,deloadMode:null,history:[],levels:{},set:{sound:1,prep:6},onboarded:0});
+let D=fresh(),storageOK=true,idb=null;
+function idbOpen(){return new Promise(function(res){try{const r=indexedDB.open("hp_db",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){res(r.result)};r.onerror=function(){res(null)}}catch(e){res(null)}})}
+function idbGet(db,k){return new Promise(function(res){try{const t=db.transaction("kv").objectStore("kv").get(k);t.onsuccess=function(){res(t.result)};t.onerror=function(){res(null)}}catch(e){res(null)}})}
+function idbSet(db,k,v){return new Promise(function(res){try{const t=db.transaction("kv","readwrite").objectStore("kv").put(v,k);t.onsuccess=function(){res(true)};t.onerror=function(){res(false)}}catch(e){res(false)}})}
+async function initStore(){
+ idb=await idbOpen();
+ let raw=null;
+ if(idb)raw=await idbGet(idb,"data");
+ if(!raw){try{raw=localStorage.getItem(KEY)}catch(e){}
+  if(raw&&idb)await idbSet(idb,"data",raw);}
+ try{if(raw)D=Object.assign(fresh(),JSON.parse(raw))}catch(e){D=fresh()}
+ let lsOK=true;try{localStorage.setItem("hp_t","1");localStorage.removeItem("hp_t")}catch(e){lsOK=false}
+ storageOK=!!idb||lsOK;
+}
+function lsTry(raw){try{localStorage.setItem(KEY,raw);return true}catch(e){return false}}
+function save(){const raw=JSON.stringify(D);if(idb)idbSet(idb,"data",raw);lsTry(raw)}
+let UI={tab:"avui",workout:null,summary:null,progSel:null,planOpen:null,cant:false,resetArm:0,exitArm:0,over:null};
+
+/* ================= Motor de progressió ================= */
+function lastEntries(exId,n){n=n||3;const out=[];for(let i=D.history.length-1;i>=0&&out.length<n;i--){const h=D.history[i];if(h.entries&&h.entries[exId])out.push({date:h.dateISO,sets:h.entries[exId].sets,up:(h.levelUps||[]).indexOf(exId)>=0})}return out}
+const bestScore=sets=>sets.reduce((m,s)=>Math.max(m,(s.k||0)*1000+(s.r||0)),0);
+const allTop=(ex,sets)=>sets.length>=1&&sets.every(s=>s.r>=ex.rep[1]);
+function isStalled(ex){if(ex.prog==="none")return false;const p=lastEntries(ex.id,3);if(p.length<3)return false;if(p[0].up||allTop(ex,p[0].sets))return false;return bestScore(p[0].sets)<=bestScore(p[2].sets)}
+function stalledList(){return ALL_EX.filter(isStalled)}
+function suggest(ex){
+ const rng=ex.sets+"×"+ex.rep[0]+"–"+ex.rep[1]+(ex.time?" s":"");
+ const prev=lastEntries(ex.id,3);
+ if(!prev.length)return{tone:"info",do:rng+" · troba la càrrega",msg:"Primera vegada: busca una càrrega que et deixi a "+ex.rirT+" dins del rang. Avui marques la línia base."};
+ const L=prev[0];
+ if(isStalled(ex)){
+  if(ex.prog==="lateral")return{tone:"warn",do:"5 sèries avui (afegida)",msg:"3 sessions sense millora → regla v2: una sèrie extra de laterals (10/setmana). Primera palanca del V-taper.",five:true};
+  if(ex.prog==="pullup")return{tone:"warn",do:"Treu llast o negatives extra",msg:"Estancat 3 sessions → avui treu pes del xaleco o afegeix 2 negatives lentes (5 s) al final."};
+  return{tone:"warn",do:"Micro-salt forçat",msg:"3 sessions clavat al mateix punt → força +1 rep a la 1a sèrie o +1–2 kg encara que el RIR baixi a 1. Si no surt, revisa son i proteïna."};
+ }
+ const v=evalExercise(ex,L.sets);
+ if(v&&v.up){
+  const big=v.code==="levelBig";
+  if(ex.prog==="ladder")return{tone:"up",do:"Variant nova · torna a "+ex.rep[0]+" reps",msg:"NIVELL: rang complet"+(big?" sobrant (RIR 3+)":"")+" → progressió: "+ex.ladder+"."};
+  if(ex.prog==="vest")return{tone:"up",do:(big?"+5 kg":"+2,4 kg")+" al xaleco · torna a "+ex.rep[0],msg:"NIVELL: rang complet"+(big?" amb RIR 3+ → salt doble de llast":"")+". Reconstrueix el rang."};
+  if(ex.prog==="time")return{tone:"up",do:"Afegeix DB als peus",msg:"Tots els holds a "+ex.rep[1]+" s → toca llast. Torna a "+ex.rep[0]+" s amb pes."};
+  if(ex.prog==="pullup")return{tone:"up",do:"Xaleco +2,4 kg · objectiu 4×5",msg:"4×8 netes l'últim dia → NIVELL: afegeix llast i torna a 5 reps per sèrie."};
+  return big?{tone:"up",do:"Puja càrrega (salt doble) · torna a "+ex.rep[0],msg:"NIVELL amb RIR 3+ a totes les sèries: et va sobrar molt. Salta dos passos de pes (+2,5–5 kg) i reconstrueix el rang."}
+            :{tone:"up",do:"Puja càrrega · torna a "+ex.rep[0]+" reps",msg:"NIVELL: rang complet. Següent DB/disc i a reconstruir."};
+ }
+ if(v&&v.code==="addset")return{tone:"up",do:"4 sèries avui · 5–8 reps",msg:"3×8 netes → escalada v2: avui passes a 4 sèries.",four:true};
+ if(v&&v.code==="down")return{tone:"down",do:"Baixa una mica la càrrega",msg:"L'últim dia no vas arribar a "+ex.rep[0]+(ex.time?" s":" reps")+" en alguna sèrie → ajusta avall i torna a dominar el rang."};
+ if(v&&v.code==="easy")return{tone:"warn",do:"+2 reps per sèrie o puja pes ja",msg:"Tot el dia a RIR 3+ dins del rang: massa fàcil. Avui força +2 reps per sèrie o puja càrrega directament."};
+ if(L.sets.some(s=>s.r>ex.rep[1]+2))return{tone:"warn",do:"Puja càrrega ja",msg:"Vas passar el rang de llarg: la càrrega era massa baixa."};
+ return{tone:"hold",do:"Mateix pes · +1 rep per sèrie",msg:"Dins del rang. Avui suma 1 rep a cada sèrie respecte a l'últim dia ("+L.sets.map(s=>s.r).join("/")+")."};
+}
+function deloadActive(){return D.deloadUntil&&todayISO()<=D.deloadUntil}
+function lastWorkoutISO(){return D.history.length?D.history[D.history.length-1].dateISO:null}
+function gapDays(){const l=lastWorkoutISO();return l==null?null:daysBetween(l,todayISO())}
+function gapTier(){const g=gapDays();if(g==null||g<=3)return 0;if(g<=7)return 1;if(g<=13)return 2;if(g<=27)return 3;return 4}
+function startReentry(){const u=new Date();u.setDate(u.getDate()+8);D.lastDeload=todayISO();D.deloadUntil=u.toISOString().slice(0,10);D.deloadMode="reentry";save();render()}
+function startDeload(){const u=new Date();u.setDate(u.getDate()+8);D.lastDeload=todayISO();D.deloadUntil=u.toISOString().slice(0,10);D.deloadMode="deload";save();render()}
+function coachMsgs(){
+ const m=[];const today=todayISO();const g=gapDays();const t=gapTier();const dl=deloadActive();
+ const sinceDel=daysBetween(D.lastDeload,today);const st=stalledList();
+ if(!storageOK)m.push({c:"red",h:"Aquest entorn no pot desar dades (mode privat?). Obre la web instal·lada normal perquè tot quedi guardat."});
+ if(!D.history.length){m.push({c:"hold",h:"Primer dia de rodatge. Avui estableixes la línia base: apunta-ho tot amb RIR honest i la resta ja la calculo jo."});return m}
+ if(dl){m.push({c:"warn",h:(D.deloadMode==="reentry"?"Readaptació activa":"Deload actiu")+" fins al "+fmtD(D.deloadUntil)+": 2 sèries per exercici al 70–80%, mateixa tècnica. No persegueixis rècords aquesta setmana."})}
+ else if(t===4)m.push({c:"warn",h:"Portes "+g+" dies parat. Protocol de retorn llarg: activa 8 dies de readaptació (2 sèries · ~70% del que feies). La memòria muscular ho recupera en 2–4 setmanes — no corris.",act:"reentry",al:"Activar readaptació (8 dies)"});
+ else if(t===3)m.push({c:"warn",h:g+" dies sense entrenar. Activa la readaptació: 8 dies amb 2 sèries al 70–80% i després tornes al pla normal. La pausa ja ha fet de deload.",act:"reentry",al:"Activar readaptació (8 dies)"});
+ else if(t===2)m.push({c:"warn",h:g+" dies parat: avui torna suau. Mateixa sessió que tocava, però amb ~−10% de càrrega i quedant-te a RIR 3. A partir de demà, normalitat."});
+ else if(t===1)m.push({c:"hold",h:g+" dies sense entrenar: cap drama, el cicle flotant t'esperava. Fes la primera sèrie de cada exercici com a aproximació i a rodar."});
+ if(!dl&&t<3){
+  if(st.length>=4&&sinceDel>=14)m.push({c:"warn",h:st.length+" exercicis estancats alhora → senyal de fatiga acumulada. Avança el deload una setmana.",act:"deload",al:"Activar deload ara (8 dies)"});
+  else if(sinceDel>=28)m.push({c:"warn",h:"Portes "+Math.floor(sinceDel/7)+" setmanes sense deload (regla: cada 4–6). Consolida el que has guanyat.",act:"deload",al:"Activar deload (8 dies)"});
+  else if(st.length)m.push({c:"hold",h:"Estancats: "+st.slice(0,2).map(e=>e.name.split(" ·")[0]).join(", ")+(st.length>2?" i "+(st.length-2)+" més":"")+". Tenen indicació especial avui — segueix-la i prou."});
+ }
+ if(m.length<2){
+  const wk=D.history.filter(x=>daysBetween(x.dateISO,today)<7).length;
+  if(wk>=5)m.push({c:"sage",h:"Ritme de pla: "+wk+" sessions en 7 dies. Objectiu V-taper en marxa — executa el call sheet i prou."});
+  else if(wk>=1&&t===0)m.push({c:"hold",h:wk+" sessions els últims 7 dies (objectiu ~5–6). Tot el que has de fer avui ja està decidit a sota."});
+ }
+ if(!m.length)m.push({c:"sage",h:"Tot en ordre. Objectiu: V-taper i recomposició. El pla pensa — tu executa."});
+ return m.slice(0,2);
+}
+
+/* ================= Àudio + hàptics ================= */
+let AC=null;
+function ensureAudio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();if(navigator.audioSession){try{navigator.audioSession.type="transient"}catch(e){}}}catch(e){}}
+function tone(f0,f1,dur,vol,when,type){try{if(!AC)return;if(D.set&&!D.set.sound)return;const t0=AC.currentTime+(when||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f0,t0);if(f1&&f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t0+dur);o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.start(t0);o.stop(t0+dur+.02)}catch(e){}}
+const sndTick=()=>tone(220,220,.06,.5,0,"triangle");
+const sndPrep=()=>tone(480,480,.07,.4,0,"triangle");
+const sndPrepHi=()=>tone(720,720,.09,.5,0,"triangle");
+const sndDown=()=>tone(700,330,.2,.55,0,"triangle");
+const sndPause=()=>{tone(440,440,.06,.45,0,"triangle");tone(440,440,.06,.45,.12,"triangle")};
+const sndUp=()=>tone(500,1000,.22,.55,0,"triangle");
+const sndDone=()=>{tone(659,659,.16,.45,0);tone(988,988,.3,.45,.18)};
+const vib=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
+/* —— v7: icones, anell setmanal, figura estàtica, PR i wake lock —— */
+const ICO={
+ today:'<path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.8V20h13V9.8"/>',
+ chart:'<path d="M5 20v-7"/><path d="M12 20V6"/><path d="M19 20v-4"/>',
+ book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+ gear:'<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.2"/><circle cx="15" cy="12" r="2.2"/><circle cx="8" cy="17" r="2.2"/>'
+};
+function icon(n,s){s=s||20;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[n]+'</svg>'}
+function ringSVG(frac,val){const R=22,C=2*Math.PI*R;return '<div class="wring"><svg width="56" height="56"><circle cx="28" cy="28" r="'+R+'" class="wring-bg"/><circle cx="28" cy="28" r="'+R+'" class="wring-fg" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-Math.max(0,Math.min(1,frac)))).toFixed(1)+'"/></svg><b>'+val+'</b></div>'}
+function figStatic(ex,size){
+ const F=FIG[ex.fig]||FIG.squat;
+ let h='<svg width="'+size+'" height="'+size+'" viewBox="0 0 100 100" aria-hidden="true">';
+ (F.p||[]).forEach(p=>{h+='<line class="prop" x1="'+p[0]+'" y1="'+p[1]+'" x2="'+p[2]+'" y2="'+p[3]+'"/>'});
+ BONES.forEach(b=>{const a=F.A[b[0]],c=F.A[b[1]];if(a&&c)h+='<line class="bone" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+c[0]+'" y2="'+c[1]+'"/>'});
+ return h+'<circle class="bhead" cx="'+F.A.h[0]+'" cy="'+F.A.h[1]+'" r="5.5"/></svg>';
+}
+function bestEver(exId){let bk=0,br=0;D.history.forEach(h=>{const e=h.entries&&h.entries[exId];if(e)e.sets.forEach(s=>{const k=s.k||0;if(k>bk){bk=k;br=s.r||0}else if(k===bk&&(s.r||0)>br)br=s.r||0})});return{bk:bk,br:br}}
+let WL=null;
+async function wakeOn(){try{if("wakeLock" in navigator)WL=await navigator.wakeLock.request("screen")}catch(e){}}
+function wakeOff(){try{if(WL){WL.release();WL=null}}catch(e){}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&UI.workout)wakeOn()});
+
+/* ================= Tempo compartit (NO TOCAR la matemàtica) ================= */
+function parseTempo(t){t=(t||"").toLowerCase();if(t.indexOf("isom")>=0)return{iso:1};const m=t.match(/(\d+)\s*-\s*(\d+)\s*-\s*(\d+)/);if(m)return{e:+m[1],p:+m[2],c:+m[3]};if(t.indexOf("ecc")>=0)return{e:3,p:0,c:1};if(t==="lent")return{e:2,p:0,c:2};return{e:2,p:0,c:1}}
+const sm=t=>t*t*(3-2*t);
+function phaseAt(tp,tl){
+ const E=tp.e,Pp=tp.p,C=Math.max(tp.c,.8);
+ if(tl<E)return{name:"ecc",t:sm(tl/E),left:E-tl};
+ if(tl<E+Pp)return{name:"pause",t:1,left:E+Pp-tl};
+ return{name:"conc",t:sm(1-((tl-E-Pp)/C)),left:0};
+}
+const cycLen=tp=>tp.iso?1:tp.e+tp.p+Math.max(tp.c,.8);
+
+/* ================= Pacer (onada) + figura (NO TOCAR) ================= */
+let P=null,Fraf=0,figT0=0;
+const WV={W:340,H:160,T:34,B:124,CW:230,BX:170};
+function waveYAt(tp,tl){if(tp.iso)return (WV.T+WV.B)/2;const ph=phaseAt(tp,tl);return WV.T+(WV.B-WV.T)*ph.t}
+function wavePath(tp){
+ const cyc=cycLen(tp);let d="";
+ for(let c=0;c<4;c++){
+  for(let x=0;x<=WV.CW;x+=4){
+   const tl=(x/WV.CW)*cyc;const X=c*WV.CW+x;const Y=waveYAt(tp,tl);
+   d+=(d?" L":"M")+X.toFixed(1)+","+Y.toFixed(1);
+  }
+ }
+ return d;
+}
+function pacerStart(){
+ ensureAudio();
+ const ex=curEx();
+ P={tp:parseTempo(ex.tempo),t0:performance.now(),reps:0,lastTick:-1,lastPhase:"",ready:true};
+ const b=document.getElementById("pbtn");if(b)b.textContent="■ Atura";
+ const w=document.getElementById("wavebox");if(w)w.classList.add("run");
+}
+function pacerStop(commit){
+ if(P&&commit&&P.reps>0&&UI.workout){
+  const d=curDraft();const s=d.sets[UI.workout.si];
+  s.r=P.reps;d.touched=true;wheelSync("reps",P.reps);
+ }
+ P=null;
+ const b=document.getElementById("pbtn");if(b)b.textContent="▶ Marca'm el ritme";
+ const w=document.getElementById("wavebox");if(w){w.classList.remove("run","glow")}
+ const ph=document.getElementById("wph");if(ph)ph.textContent="aturat";
+}
+function figDraw(pose){
+ BONES.forEach(function(b,i){
+  const el=document.getElementById("fb"+i);if(!el)return;
+  const a=pose[b[0]],c=pose[b[1]];
+  if(!a||!c){el.setAttribute("opacity","0");return}
+  el.setAttribute("opacity","1");
+  el.setAttribute("x1",a[0]);el.setAttribute("y1",a[1]);el.setAttribute("x2",c[0]);el.setAttribute("y2",c[1]);
+ });
+ const hd=document.getElementById("fhd");if(hd&&pose.h){hd.setAttribute("cx",pose.h[0]);hd.setAttribute("cy",pose.h[1])}
+}
+function lerpPose(A,B,t){const o={};for(const k in A){if(B[k])o[k]=[A[k][0]+(B[k][0]-A[k][0])*t,A[k][1]+(B[k][1]-A[k][1])*t];else o[k]=A[k]}return o}
+function frame(now){
+ if(!UI.workout||UI.workout.phase!=="set"){Fraf=0;return}
+ const ex=curEx();const tp=parseTempo(ex.tempo);const cyc=cycLen(tp);
+ const F=FIG[ex.fig]||FIG.squat;
+ let figT;
+ if(P){
+  const el=(now-P.t0)/1000;
+  const cnt=document.getElementById("wcountn"),ph=document.getElementById("wph"),grp=document.getElementById("wgrp"),ball=document.getElementById("wball"),box=document.getElementById("wavebox");
+  const PREP=(D.set&&D.set.prep)||6;
+  if(el<PREP){
+   const left=Math.ceil(PREP-el);
+   if(ph)ph.textContent="prepara't · "+left;
+   if(cnt)cnt.textContent=left;
+   const s=Math.floor(el);
+   if(s!==P.lastTick){P.lastTick=s;if(PREP-s<=3)sndPrepHi();else sndPrep()}
+   figT=0;
+   if(ball)ball.setAttribute("cy",WV.T);
+  }else{
+   const tl=(el-PREP)%cyc;const rep=Math.floor((el-PREP)/cyc);
+   if(tp.iso){
+    const s=Math.floor(el-PREP);
+    if(s!==P.lastTick){P.lastTick=s;P.reps=s;if(s>0&&s%10===0)sndPause();else if(s>0&&s%5===0)sndTick()}
+    if(cnt)cnt.textContent=s;if(ph)ph.textContent="aguanta";
+    figT=0.5+0.18*Math.sin((el-PREP)*1.6);
+   }else{
+    P.reps=rep;if(cnt)cnt.textContent=rep;
+    const f=phaseAt(tp,tl);
+    if(f.name==="ecc"){
+     if(ph)ph.textContent="baixa · "+Math.ceil(f.left);
+     if(P.lastPhase!=="ecc"){P.lastTick=0;sndDown()}
+     const sec=Math.floor(tl);
+     if(sec!==P.lastTick){P.lastTick=sec;sndTick()}
+     if(box)box.classList.remove("glow");
+    }else if(f.name==="pause"){
+     if(ph)ph.textContent="aguanta a baix";
+     if(P.lastPhase!=="pause"){sndPause();vib([28,45,28])}
+     if(box)box.classList.add("glow");
+    }else{
+     if(ph)ph.textContent="puja!";
+     if(P.lastPhase!=="conc"){sndUp();vib(18)}
+     if(box)box.classList.remove("glow");
+    }
+    P.lastPhase=f.name;
+    figT=f.t;
+    if(grp)grp.setAttribute("transform","translate("+(WV.BX-WV.CW-(tl/cyc)*WV.CW)+",0)");
+    if(ball)ball.setAttribute("cy",waveYAt(tp,tl));
+   }
+  }
+ }else{
+  const el=(now-figT0)/1000;
+  if(tp.iso)figT=0.5+0.18*Math.sin(el*1.6);
+  else figT=phaseAt(tp,el%cyc).t;
+ }
+ figDraw(lerpPose(F.A,F.B,figT));
+ Fraf=requestAnimationFrame(frame);
+}
+function kickFrame(){figT0=performance.now();if(!Fraf)Fraf=requestAnimationFrame(frame)}
+
+/* ================= Sessió seqüencial ================= */
+function loggedSets(d){return d.sets.filter(s=>s.r>0&&s.rir!=null).map(s=>({r:s.r,k:s.k,rir:s.rir}))}
+function evalExercise(ex,sets){
+ if(ex.prog==="none"||!sets.length)return null;
+ const top=sets.every(s=>s.r>=ex.rep[1]);
+ const easy=sets.every(s=>s.rir!=null&&s.rir>=3);
+ const low=sets.some(s=>s.r<ex.rep[0]);
+ if(ex.prog==="pullup"){
+  if(top&&sets.length>=4)return{code:"level",up:true};
+  if(top&&sets.length===3)return{code:"addset",up:false};
+ }else if(top&&sets.length>=ex.sets)return{code:easy?"levelBig":"level",up:true};
+ if(low)return{code:"down",up:false};
+ if(easy)return{code:"easy",up:false};
+ return{code:"hold",up:false};
+}
+function applyKg(v){
+ const w=UI.workout;if(!w)return;
+ const d=curDraft();d.sets[w.si].k=v;
+ for(let j=w.si+1;j<d.sets.length;j++)if(d.sets[j].rir==null)d.sets[j].k=v;
+ d.touched=d.touched||v>0;
+}
+function saveDraft(){
+ const w=UI.workout;
+ if(!w){D.draft=null;save();return}
+ const sets={};
+ curS().ex.forEach(e=>{sets[e.id]=w.draft[e.id].sets.map(s=>({r:s.r,k:s.k,rir:s.rir==null?null:s.rir}))});
+ D.draft={sk:w.sk,dateISO:todayISO(),t0:w.t0,soft:w.soft?1:0,sets:sets,verdicts:w.verdicts||{}};
+ save();
+}
+function startWorkout(){
+ const sk=CYCLE[D.cycleIndex%8];const S=SESSIONS[sk];const draft={};const t=gapTier();
+ const res=(D.draft&&D.draft.dateISO===todayISO()&&D.draft.sk===sk)?D.draft:null;
+ if(D.draft&&!res){D.draft=null;save()}
+ S.ex.forEach(ex=>{
+  const prev=lastEntries(ex.id,1)[0];const sug=suggest(ex);
+  let n=deloadActive()?2:ex.sets;
+  if(sug.four&&!deloadActive())n=4;
+  if(sug.five&&!deloadActive())n=5;
+  let sets=[];
+  if(res&&res.sets[ex.id])sets=res.sets[ex.id].map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir}));
+  else for(let i=0;i<n;i++){const p=prev&&prev.sets[Math.min(i,prev.sets.length-1)];sets.push({r:p?p.r:0,k:p?p.k:0,rir:null})}
+  draft[ex.id]={sets:sets,touched:false,sug:sug};
+ });
+ UI.workout={sk:sk,draft:draft,ei:0,si:0,sideIdx:0,phase:"set",soft:res?!!res.soft:(t===2&&!deloadActive()),rest:null,info:false,t0:res?res.t0:Date.now(),verdicts:res?(res.verdicts||{}):{}};
+ if(res){
+  let nu=null;
+  outer:for(let i=0;i<S.ex.length;i++){const ss=draft[S.ex[i].id].sets;for(let j=0;j<ss.length;j++)if(ss[j].rir==null){nu={ei:i,si:j};break outer}}
+  if(nu){UI.workout.ei=nu.ei;UI.workout.si=nu.si}
+ }
+ wakeOn();
+ saveDraft();
+ UI.cant=false;render();
+}
+const curS=()=>SESSIONS[UI.workout.sk];
+const curEx=()=>curS().ex[UI.workout.ei];
+const curDraft=()=>UI.workout.draft[curEx().id];
+function totalSets(){return curS().ex.reduce((a,e)=>a+UI.workout.draft[e.id].sets.length,0)}
+function doneSets(){return curS().ex.reduce((a,e)=>a+UI.workout.draft[e.id].sets.filter(s=>s.rir!=null&&s.r>0).length,0)}
+function nextSeq(ei,si){const w=UI.workout;const d=w.draft[curS().ex[ei].id];if(si+1<d.sets.length)return{ei:ei,si:si+1};if(ei+1<curS().ex.length)return{ei:ei+1,si:0};return null}
+function nextUnlogged(ei,si){
+ let p=nextSeq(ei,si);
+ while(p){const s=UI.workout.draft[curS().ex[p.ei].id].sets[p.si];if(s.rir==null)return p;p=nextSeq(p.ei,p.si)}
+ return null;
+}
+function gotoPos(p){const w=UI.workout;w.ei=p.ei;w.si=p.si;w.sideIdx=0;w.phase="set";pacerStop(false);render()}
+function navStep(dir){
+ const w=UI.workout;pacerStop(false);
+ if(dir>0){const n=nextSeq(w.ei,w.si);if(n)gotoPos(n);else{w.phase="finish";render()}}
+ else{
+  if(w.si>0)gotoPos({ei:w.ei,si:w.si-1});
+  else if(w.ei>0){const pe=w.ei-1;gotoPos({ei:pe,si:w.draft[curS().ex[pe].id].sets.length-1})}
+ }
+}
+function commitSet(rir){
+ const w=UI.workout;const ex=curEx();const d=curDraft();const s=d.sets[w.si];
+ if(P)pacerStop(true);
+ if(ex.side&&w.sideIdx===0){w.sideIdx=1;s.rirL=rir;vib([20,40,20]);sndPause();render();return}
+ s.rir=(s.rirL!=null)?Math.max(rir,s.rirL):rir;
+ delete s.rirL;
+ if(!s.r)s.r=0;
+ d.touched=s.r>0||d.touched;
+ if(d.sets.every(x=>x.rir!=null)){
+  const vv=evalExercise(ex,loggedSets(d));
+  if(vv)w.verdicts[ex.id]=vv;else delete w.verdicts[ex.id];
+ }
+ saveDraft();
+ startRest();
+}
+function clearSet(){const w=UI.workout;const s=curDraft().sets[w.si];s.rir=null;delete s.rirL;w.sideIdx=0;delete w.verdicts[curEx().id];saveDraft();render()}
+function startRest(){
+ const w=UI.workout;const ex=curEx();
+ const s=curDraft().sets[w.si];
+ const be=bestEver(ex.id);
+ const pr=((s.k||0)>be.bk||(((s.k||0)===be.bk)&&(s.r||0)>be.br))&&(be.bk>0||be.br>0);
+ const nx=nextUnlogged(w.ei,w.si);
+ let label="Final de sessió — només queda guardar";
+ if(nx){const ne=curS().ex[nx.ei];label=(nx.ei===w.ei?("Sèrie "+(nx.si+1)+" · "+ne.name):("Següent: "+ne.name))+(ne.side?" (dos costats)":"")}
+ w.rest={total:ex.rest,until:Date.now()+ex.rest*1000,nx:nx,from:{ei:w.ei,si:w.si},label:label,fin:false,pr:pr};
+ w.phase="rest";ensureAudio();
+ if(pr){tone(523,1046,.4,.4,.05);vib([60,40,60,40,120])}
+ render();
+ if(w.restIv)clearInterval(w.restIv);
+ w.restIv=setInterval(restTick,250);restTick();
+}
+const RING_RC=2*Math.PI*112;
+function restTick(){
+ const w=UI.workout;if(!w||!w.rest)return;
+ const rem=Math.max(0,Math.ceil((w.rest.until-Date.now())/1000));
+ const n=document.getElementById("rnum"),rg=document.getElementById("rring");
+ if(n)n.textContent=fmtT(rem);
+ if(rg)rg.style.strokeDashoffset=RING_RC*(1-rem/w.rest.total);
+ if(rem===0&&!w.rest.fin){
+  w.rest.fin=true;sndDone();vib([220,110,220]);
+  const el=document.getElementById("restwrap");if(el)el.classList.add("fi");
+  setTimeout(restAdvance,1200);
+ }
+}
+function restAdvance(){
+ const w=UI.workout;if(!w||w.phase!=="rest")return;
+ clearInterval(w.restIv);const nx=w.rest.nx;w.rest=null;
+ if(nx){w.ei=nx.ei;w.si=nx.si;w.sideIdx=0;w.phase="set"}else w.phase="finish";
+ render();
+}
+function restUndo(){
+ const w=UI.workout;if(!w||!w.rest)return;
+ clearInterval(w.restIv);const fr=w.rest.from;w.rest=null;
+ w.ei=fr.ei;w.si=fr.si;w.sideIdx=0;w.phase="set";render();
+}
+function restPlus30(){const w=UI.workout;if(w.rest){w.rest.until+=30000;w.rest.total+=30;w.rest.fin=false;const el=document.getElementById("restwrap");if(el)el.classList.remove("fi")}}
+function finishWorkout(){
+ const w=UI.workout;const S=SESSIONS[w.sk];const entries={};const ups=[];const dec={};
+ const gBefore=gapDays();
+ S.ex.forEach(ex=>{
+  const d=w.draft[ex.id];
+  const sets=loggedSets(d);
+  if(!sets.length)return;
+  entries[ex.id]={sets:sets};
+  const vv=(w.verdicts&&w.verdicts[ex.id])||evalExercise(ex,sets);
+  if(vv){dec[ex.id]=vv.code;if(vv.up&&!deloadActive()&&!w.soft)ups.push(ex.id)}
+ });
+ pacerStop(false);if(w.restIv)clearInterval(w.restIv);wakeOff();
+ if(!Object.keys(entries).length){D.draft=null;UI.workout=null;save();render();return}
+ const setsN=doneSets();
+ const dur=Math.max(1,Math.round((Date.now()-(w.t0||Date.now()))/60000));
+ ups.forEach(id=>{D.levels[id]=(D.levels[id]||0)+1});
+ D.history.push({id:Date.now(),dateISO:todayISO(),sessionKey:w.sk,deload:!!deloadActive(),entries:entries,levelUps:ups,dec:dec,dur:dur});
+ D.cycleIndex=(D.cycleIndex+1)%8;
+ if(gBefore!=null&&gBefore>=7)D.lastDeload=todayISO();
+ D.draft=null;
+ save();
+ const st=stalledList();
+ UI.summary={sk:w.sk,n:Object.keys(entries).length,ups:ups,st:st.map(e=>e.name),sets:setsN,dur:dur};
+ UI.workout=null;render();
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(D,null,1)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download="hollywood-protocol-backup-"+todayISO()+".json";document.body.appendChild(a);a.click();a.remove();
+}
+function plates(total){
+ if(!(total>20.01))return{bar:true,out:[],rem:0};
+ let rem=(total-20)/2;const out=[];
+ [20,15,10,5,2.5,1.25].forEach(p=>{const n=Math.floor(rem/p+1e-9);if(n>0){out.push({n:n,p:p});rem=+(rem-n*p).toFixed(2)}});
+ return{bar:false,out:out,rem:rem};
+}
+
+/* ================= Vistes ================= */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function vStrip(idx){
+ const sprk='<div class="sprk">'+'<i></i>'.repeat(16)+'</div>';
+ const fr=CYCLE.map((k,i)=>{
+  const rest=k==="REST";const cls="frame"+(i===idx?" cur":i<idx?" done":"")+(rest?" rest":"");
+  const lab=rest?"☾":k.split("_")[0][0]+k.split("_")[1];
+  return '<div class="'+cls+'"><b>'+lab+'</b><small>D'+(i+1)+'</small></div>';
+ }).join("");
+ return '<div class="strip">'+sprk+'<div class="frames">'+fr+'</div>'+sprk+'</div>';
+}
+function focusGroups(sk){
+ const f=SESSIONS[sk].focus.toLowerCase();const g={};
+ if(f.indexOf("pit")>=0)g.chest=1;
+ if(f.indexOf("espatll")>=0)g.deltf=1;
+ if(f.indexOf("rear delts")>=0)g.deltb=1;
+ if(f.indexOf("tríceps")>=0)g.tri=1;
+ if(f.indexOf("bíceps")>=0)g.bi=1;
+ if(f.indexOf("esquena")>=0){g.lats=1;g.traps=1;g.deltb=1}
+ if(f.indexOf("core")>=0)g.core=1;
+ if(f.indexOf("quàdriceps")>=0)g.quads=1;
+ if(f.indexOf("isquios")>=0)g.hams=1;
+ if(f.indexOf("gluti")>=0)g.gluts=1;
+ if(f.indexOf("bessons")>=0)g.calves=1;
+ return g;
+}
+function vAnat(sk){
+ const g=focusGroups(sk);const on=k=>g[k]?" on":"";
+ const front='<svg width="58" height="124" viewBox="0 0 70 150">'
+  +'<circle class="bod" cx="35" cy="11" r="7"/>'
+  +'<rect class="bod" x="22" y="21" width="26" height="44" rx="9"/>'
+  +'<rect class="bod" x="11" y="24" width="8" height="35" rx="4"/><rect class="bod" x="51" y="24" width="8" height="35" rx="4"/>'
+  +'<rect class="bod" x="23" y="66" width="11" height="52" rx="5"/><rect class="bod" x="36" y="66" width="11" height="52" rx="5"/>'
+  +'<ellipse class="mus'+on("chest")+'" cx="29" cy="30" rx="5.5" ry="4"/><ellipse class="mus'+on("chest")+'" cx="41" cy="30" rx="5.5" ry="4"/>'
+  +'<circle class="mus'+on("deltf")+'" cx="16" cy="26" r="4.4"/><circle class="mus'+on("deltf")+'" cx="54" cy="26" r="4.4"/>'
+  +'<ellipse class="mus'+on("bi")+'" cx="15" cy="38" rx="3.4" ry="6"/><ellipse class="mus'+on("bi")+'" cx="55" cy="38" rx="3.4" ry="6"/>'
+  +'<rect class="mus'+on("core")+'" x="29" y="40" width="12" height="17" rx="3.5"/>'
+  +'<ellipse class="mus'+on("quads")+'" cx="28.5" cy="84" rx="4.8" ry="13"/><ellipse class="mus'+on("quads")+'" cx="41.5" cy="84" rx="4.8" ry="13"/>'
+  +'</svg>';
+ const back='<svg width="58" height="124" viewBox="0 0 70 150">'
+  +'<circle class="bod" cx="35" cy="11" r="7"/>'
+  +'<rect class="bod" x="22" y="21" width="26" height="44" rx="9"/>'
+  +'<rect class="bod" x="11" y="24" width="8" height="35" rx="4"/><rect class="bod" x="51" y="24" width="8" height="35" rx="4"/>'
+  +'<rect class="bod" x="23" y="66" width="11" height="52" rx="5"/><rect class="bod" x="36" y="66" width="11" height="52" rx="5"/>'
+  +'<ellipse class="mus'+on("traps")+'" cx="35" cy="26" rx="9" ry="5"/>'
+  +'<circle class="mus'+on("deltb")+'" cx="16" cy="26" r="4.4"/><circle class="mus'+on("deltb")+'" cx="54" cy="26" r="4.4"/>'
+  +'<ellipse class="mus'+on("lats")+'" cx="28" cy="40" rx="5.2" ry="9"/><ellipse class="mus'+on("lats")+'" cx="42" cy="40" rx="5.2" ry="9"/>'
+  +'<ellipse class="mus'+on("tri")+'" cx="15" cy="38" rx="3.4" ry="6"/><ellipse class="mus'+on("tri")+'" cx="55" cy="38" rx="3.4" ry="6"/>'
+  +'<circle class="mus'+on("gluts")+'" cx="30" cy="64" r="5.4"/><circle class="mus'+on("gluts")+'" cx="40" cy="64" r="5.4"/>'
+  +'<ellipse class="mus'+on("hams")+'" cx="28.5" cy="87" rx="4.6" ry="12"/><ellipse class="mus'+on("hams")+'" cx="41.5" cy="87" rx="4.6" ry="12"/>'
+  +'<ellipse class="mus'+on("calves")+'" cx="28.5" cy="110" rx="4" ry="8.5"/><ellipse class="mus'+on("calves")+'" cx="41.5" cy="110" rx="4" ry="8.5"/>'
+  +'</svg>';
+ return '<div class="anat">'+front+back+'</div>';
+}
+function vCoach(){
+ const ms=coachMsgs();
+ let h='<div class="card coach"><span class="mono acc-c">🎬 L\'entrenador</span>';
+ ms.forEach(x=>{h+='<div class="cm '+x.c+'">'+x.h+'</div>';if(x.act)h+='<button class="btn btn-soft" data-a="'+x.act+'">'+x.al+'</button>'});
+ return h+'</div>';
+}
+function vHome(){
+ const idx=D.cycleIndex%8;const sk=CYCLE[idx];const isRest=sk==="REST";const S=isRest?null:SESSIONS[sk];
+ const lastW=lastWorkoutISO();const today=todayISO();const dl=deloadActive();
+ let h='<div class="rise">'+vStrip(idx)+vCoach();
+ h+='<div class="sheet"><div class="bar"><span class="mono">Call sheet · dia '+(idx+1)+'/8</span><span class="mono a">'+(lastW?"últ. sessió "+fmtD(lastW):"dia 1")+'</span></div><div class="body">';
+ if(isRest){
+  h+='<div style="flex:1"><h1>DESCANS</h1><p class="sub">Avui no s\'aixeca res. Mobilitat suau, passeig, dormir bé: el múscul es construeix avui.</p>'
+   +'<button class="btn btn-ink" data-a="restdone" style="margin-top:18px">✓ Descans fet → següent</button></div>';
+ }else{
+  h+='<div style="flex:1"><span class="mono eyebrow">Avui toca</span><h1>'+S.name+'</h1><p class="sub">'+S.focus+'</p>'
+   +'<div class="meta"><span>'+S.ex.length+' exercicis</span><span>'+S.dur+'</span>'+(dl?'<span style="color:#1d52b8">'+(D.deloadMode==="reentry"?"readaptació":"deload")+'</span>':'')+'</div>'
+   +'<button class="btn btn-ink" data-a="start" style="margin-top:18px">▶ Començar sessió</button>'
+   +'<button class="btn btn-ghost" data-a="cant" style="margin-top:10px">Avui no puc entrenar</button>'
+   +(UI.cant?'<div class="calm"><b>Tranquil — el cicle flotant t\'espera.</b> No saltis res ni «recuperis» dies: la pròxima vegada fas <b>'+S.name+'</b> igualment. Si la pausa s\'allarga, jo t\'aplicaré el protocol de retorn que toqui.</div>':'')
+   +'</div>'+vAnat(sk);
+ }
+ h+='</div></div>';
+ const week=D.history.filter(x=>daysBetween(x.dateISO,today)<7).length;
+ const lv=Object.values(D.levels).reduce((a,b)=>a+b,0);
+ h+='<div class="stats"><div class="stat">'+ringSVG(week/6,week)+'<span>sessions / setmana</span></div><div class="stat"><b>'+lv+'</b><span>nivells ★</span></div><div class="stat"><b>'+D.history.length+'</b><span>sessions totals</span></div></div></div>';
+ return h;
+}
+function wheelVals(kind,ex){
+ if(kind==="kg"){const a=[];for(let v=0;v<=120;v+=.5)a.push(v);return a}
+ if(ex.time){const a=[];for(let v=0;v<=120;v+=5)a.push(v);return a}
+ const a=[];for(let v=0;v<=30;v++)a.push(v);return a;
+}
+const ITEM_H=56;
+function wheelHTML(kind,ex){
+ const vals=wheelVals(kind,ex);
+ let items='<div class="wpad"></div>';
+ vals.forEach((v,i)=>{items+='<div class="witem" data-wi="'+i+'">'+(kind==="kg"?(v%1?v.toFixed(1):v):v)+'</div>'});
+ items+='<div class="wpad"></div>';
+ return '<div class="wcol"><div class="wlab">'+(kind==="kg"?"kg (extra/total)":(ex.time?"segons":"reps"+(ex.side?" /"+ex.side:"")))+'</div>'
+  +'<div class="wbox"><div class="wheel" data-wheel="'+kind+'" id="wh-'+kind+'">'+items+'</div><div class="wsel"></div></div></div>';
+}
+function wheelIdx(kind,ex,val){const vals=wheelVals(kind,ex);let best=0,bd=1e9;vals.forEach((v,i)=>{const d=Math.abs(v-val);if(d<bd){bd=d;best=i}});return best}
+function wheelInit(){
+ ["reps","kg"].forEach(kind=>{
+  const el=document.getElementById("wh-"+kind);if(!el)return;
+  const ex=curEx();const s=curDraft().sets[UI.workout.si];
+  el.scrollTop=wheelIdx(kind,ex,kind==="kg"?(s.k||0):(s.r||0))*ITEM_H;
+  let tm=null;
+  el.addEventListener("scroll",function(){
+   if(tm)clearTimeout(tm);
+   tm=setTimeout(function(){
+    const i=Math.round(el.scrollTop/ITEM_H);el.scrollTo({top:i*ITEM_H,behavior:"smooth"});
+    const vals=wheelVals(kind,ex);const v=vals[Math.max(0,Math.min(i,vals.length-1))];
+    if(kind==="kg")applyKg(v);
+    else{const st=curDraft().sets[UI.workout.si];st.r=v;curDraft().touched=curDraft().touched||v>0}
+    vib(8);
+   },140);
+  },{passive:true});
+  el.addEventListener("click",function(e){const it=e.target.closest("[data-wi]");if(it)el.scrollTo({top:(+it.dataset.wi)*ITEM_H,behavior:"smooth"})});
+ });
+}
+function wheelSync(kind,val){const el=document.getElementById("wh-"+kind);if(el)el.scrollTo({top:wheelIdx(kind,curEx(),val)*ITEM_H,behavior:"smooth"})}
+function figSVG(size){
+ size=size||98;
+ let h='<svg width="'+size+'" height="'+size+'" viewBox="0 0 100 100"><g>';
+ const F=FIG[curEx().fig]||FIG.squat;
+ (F.p||[]).forEach(p=>{h+='<line class="prop" x1="'+p[0]+'" y1="'+p[1]+'" x2="'+p[2]+'" y2="'+p[3]+'"/>'});
+ BONES.forEach((b,i)=>{h+='<line class="bone" id="fb'+i+'" opacity="0"/>'});
+ h+='<circle class="bhead" id="fhd" r="5.5" cx="50" cy="14"/></g></svg>';
+ return h;
+}
+function vFocus(){
+ const w=UI.workout;const S=curS();const ex=curEx();const d=curDraft();const s=d.sets[w.si];
+ const dl=deloadActive();
+ const doneEx=S.ex.filter(e=>w.draft[e.id].sets.some(x=>x.rir!=null&&x.r>0)).length;
+ const pct=Math.round(100*doneSets()/Math.max(1,totalSets()));
+ const doTxt=dl?"2 sèries · 70–80% del pes habitual":w.soft?"−10% de càrrega · RIR 3 avui":d.sug.do;
+ const tp=parseTempo(ex.tempo);
+ let h='<div class="focus">'
+  +'<div class="fhead"><button class="fx" data-a="exit" aria-label="Sortir de la sessió">'+(UI.exitArm?"✕?":"✕")+'</button>'
+  +'<div class="fprog"><div class="ft">'+S.name+' · '+doneEx+'/'+S.ex.length+' exercicis fets</div><div class="fbar"><i style="width:'+pct+'%"></i></div></div>'
+  +'<button class="fx" data-a="list" aria-label="Llista d\'exercicis">☰</button></div>'
+  +'<div class="fbody">'
+  +'<div class="hero"><div class="fig fig-h">'+figSVG(126)+'</div><div class="hcol">'
+  +'<span class="heyebrow">Exercici '+(w.ei+1)+' de '+S.ex.length+(ex.star?' · <span class="acc-c">★ prioritat</span>':'')+'</span>'
+  +'<div class="hname">'+esc(ex.name)+'</div>'
+  +'<div class="fdo fdo-mini"><span class="mono">Avui</span><span>'+esc(doTxt)+'</span></div>'
+  +'</div></div>'
+  +'<div class="bigstats"><div class="bstat"><span class="bl">Sèrie</span><div class="bv">'+(w.si+1)+'<small>/'+d.sets.length+'</small></div></div>'
+  +'<div class="bstat"><span class="bl">Objectiu</span><div class="bv">'+ex.rep[0]+'–'+ex.rep[1]+'<small> '+(ex.time?"s":"reps")+'</small></div></div></div>'
+  +(ex.side?'<div class="sidepill">Costat '+(w.sideIdx===0?"ESQUERRE → després el dret":"DRET · l\'últim")+'</div>':'')
+  +(s.rir!=null?'<div class="fset"><span class="edited">✓ Sèrie desada (RIR '+(s.rir===3?"3+":s.rir)+') — torna a triar RIR per corregir <button class="undochip" data-a="clearset">↩ esborrar</button></span></div>':'')
+  +'<div class="wave" id="wavebox"><span class="wph" id="wph">▶ marca el ritme</span><span class="wcount"><span id="wcountn">'+(s.r||0)+'</span><small>'+(ex.time?"segons":"reps")+'</small></span>'
+  +'<svg viewBox="0 0 '+WV.W+' '+WV.H+'" preserveAspectRatio="none">'
+  +'<line class="wlane" x1="0" y1="'+WV.T+'" x2="'+WV.W+'" y2="'+WV.T+'"/><line class="wlane" x1="0" y1="'+WV.B+'" x2="'+WV.W+'" y2="'+WV.B+'"/>'
+  +'<g id="wgrp" transform="translate('+(WV.BX-WV.CW)+',0)"><path class="wpath" d="'+wavePath(tp)+'"/></g>'
+  +'<circle class="wball" id="wball" cx="'+WV.BX+'" cy="'+WV.T+'" r="9"/>'
+  +'</svg></div>'
+  +'<button class="pbtn" id="pbtn" data-a="pacer">▶ Marca\'m el ritme</button>'
+  +'<div class="chips chips-c"><span class="chip">Tempo '+esc(ex.tempo)+'</span><span class="chip">Descans '+fmtT(ex.rest)+'</span>'
+  +(ex.load.indexOf("Barra")>=0?'<span class="chip tap" data-a="plates">🏋 Discos</span>':'')
+  +'<span class="chip tap" data-a="info">ℹ '+(w.info?"menys":"tècnica")+'</span></div>'
+  +(w.info?'<div class="tech">'+esc(ex.tech)+'</div>'+((dl||w.soft)?'':'<div class="sug '+d.sug.tone+'">'+esc(d.sug.msg)+'</div>')+(lastEntries(ex.id,1)[0]?'<div class="last">Últ. ('+fmtD(lastEntries(ex.id,1)[0].date)+'): '+lastEntries(ex.id,1)[0].sets.map(x=>x.r+(x.k?"@"+x.k:"")).join(" · ")+'</div>':''):'')
+  +'<div class="fwheels">'+wheelHTML("reps",ex)+wheelHTML("kg",ex)+'</div>'
+  +'<div class="frir"><div class="rl">'+(ex.side&&w.sideIdx===0?"RIR d'aquest costat — després canvies de membre":"Tria el RIR i la sèrie es desa sola · objectiu "+esc(ex.rirT))+'</div>'
+  +'<div class="frirrow">'+[0,1,2,3].map(r=>'<button data-a="rir" data-r="'+r+'">'+(r===3?"3+":r)+'<small>RIR</small></button>').join("")+'</div></div>'
+  +'</div>'
+  +'<div class="ffoot"><button class="fnav" data-a="prev">‹ Anterior</button>'
+  +(w.si===d.sets.length-1?'<button class="fnav" data-a="addset">+ sèrie</button>':'')
+  +'<button class="fnav" data-a="next">Següent ›</button></div>'
+  +'</div>';
+ if(UI.over==="list")h+=vList();
+ if(UI.over==="plates")h+=vPlates();
+ return h;
+}
+function vList(){
+ const w=UI.workout;
+ let h='<div class="over" data-a="closeover"><div class="osheet glass" data-stop="1"><span class="mono acc-c">Sessió '+curS().name+'</span>';
+ curS().ex.forEach((e,i)=>{
+  const dd=w.draft[e.id];const dn=dd.sets.filter(x=>x.rir!=null&&x.r>0).length;
+  h+='<div class="oline'+(i===w.ei?" cur":"")+'" data-a="jump" data-i="'+i+'"><span class="mono mut">'+String(i+1).padStart(2,"0")+'</span><span class="n">'+esc(e.name)+'</span><span class="st">'+dn+'/'+dd.sets.length+(dn>=dd.sets.length?" ✓":"")+'</span></div>';
+ });
+ h+='<button class="btn btn-acc" data-a="gofinish" style="margin-top:16px">■ Acabar i guardar ('+doneSets()+' sèries)</button></div></div>';
+ return h;
+}
+function vPlates(){
+ const w=UI.workout;const s=curDraft().sets[w.si];const kg=s.k||0;const r=plates(kg);
+ let h='<div class="over" data-a="closeover"><div class="osheet glass" data-stop="1"><span class="mono acc-c">🏋 Discos per a '+kg+' kg</span>';
+ if(kg<=0)h+='<p class="empty">Posa primer els kg a la roda i torna a obrir això.</p>';
+ else if(r.bar)h+='<p style="font-size:14px;margin-top:12px;line-height:1.5">Amb '+kg+' kg en tens prou amb la <b>barra sola de 20 kg</b> (o una barra més lleugera si en tens).</p>';
+ else{
+  h+='<div class="plrow"><span>Barra</span><span>20 kg</span></div>';
+  r.out.forEach(x=>{h+='<div class="plrow"><span>Disc de '+x.p+' kg</span><span>×'+x.n+' per banda</span></div>'});
+  if(r.rem>0.01)h+='<p style="font-size:12.5px;color:var(--mut);margin-top:10px;line-height:1.5">Sobren '+r.rem.toFixed(2).replace(".00","")+' kg per banda — arrodoneix al pes possible i apunta\'l a la roda.</p>';
+ }
+ h+='<button class="btn btn-line" data-a="closeover" style="margin-top:16px">Tancar</button></div></div>';
+ return h;
+}
+function vRest(){
+ const w=UI.workout;
+ const ne=w.rest.nx?curS().ex[w.rest.nx.ei]:null;
+ return '<div class="restwrap" id="restwrap">'
+  +(w.rest.pr?'<div class="prbadge">🏆 Rècord personal</div>':'')
+  +'<div class="rring"><svg width="252" height="252"><circle class="rring-bg" cx="126" cy="126" r="112"/><circle class="rring-fg" id="rring" cx="126" cy="126" r="112" stroke-dasharray="'+RING_RC+'" stroke-dashoffset="0"/></svg>'
+  +'<div class="rnum"><b id="rnum">'+fmtT(Math.ceil((w.rest.until-Date.now())/1000))+'</b><span>descans actiu</span></div></div>'
+  +'<div class="rnext"><div class="nl">A continuació</div>'
+  +(ne?'<div class="fig-s">'+figStatic(ne,86)+'</div>':'')
+  +'<div class="nv">'+esc(w.rest.label)+'</div></div>'
+  +'<div class="rbtns"><button class="btn btn-line" data-a="restundo">↩ Corregir</button><button class="btn btn-line" data-a="plus30">+30 s</button><button class="btn btn-acc" data-a="skiprest">Saltar ›</button></div>'
+  +'</div>';
+}
+function vFinish(){
+ return '<div class="focus"><div class="sumwrap" style="min-height:100%">'
+  +'<span class="mono mut">Sessió completada</span>'
+  +'<div class="disp" style="font-size:38px;color:var(--paper);letter-spacing:-1px">'+curS().name+'</div>'
+  +'<span class="mono mut">'+doneSets()+' sèries registrades</span>'
+  +'<button class="btn btn-acc" data-a="gofinish" style="margin-top:28px;max-width:280px">■ Guardar sessió</button>'
+  +'<button class="btn btn-line" data-a="list" style="margin-top:12px;max-width:280px">Revisar exercicis</button>'
+  +'</div>'+(UI.over==="list"?vList():"")+'</div>';
+}
+function vSummary(){
+ const s=UI.summary;const nextKey=CYCLE[D.cycleIndex%8];
+ let h='<div class="sumwrap"><span class="mono mut">Sessió guardada</span><div class="disp" style="font-size:36px;color:var(--paper);letter-spacing:-1px">'+SESSIONS[s.sk].name+'</div><span class="mono mut">'+s.n+' exercicis · '+(s.sets||0)+' sèries'+(s.dur?(' · '+s.dur+' min'):'')+'</span>';
+ if(s.ups.length){h+='<div style="width:100%;max-width:340px;margin-top:16px">';
+  s.ups.forEach(id=>{h+='<div class="stamp">🏆<div><span class="mono">NIVELL +1</span><div style="font-size:13px;color:var(--txt);margin-top:3px;line-height:1.45">'+esc(EX(id).name)+' — el pròxim dia ja t\'ho prescriuré pujat.</div></div></div>'});
+  h+='</div>';
+ }else h+='<p style="margin-top:16px;font-size:14px;color:var(--mut);max-width:300px;line-height:1.55">Cap nivell avui — perfecte igualment. Quan completis el rang amb RIR ≤2, jo mateix et pujaré la prescripció.</p>';
+ if(s.st&&s.st.length)h+='<p style="margin-top:12px;font-size:12.5px;color:var(--warn);max-width:300px;line-height:1.5">⚠ En vigilància per estancament: '+esc(s.st.slice(0,3).join(", "))+'.</p>';
+ h+='<div class="card" style="margin-top:22px;padding:12px 18px"><span class="mono mut">Següent</span> <span class="disp acc-c" style="font-size:19px;margin-left:8px">'+(nextKey==="REST"?"DESCANS":SESSIONS[nextKey].name)+'</span></div>';
+ h+='<button class="btn btn-acc" data-a="sumok" style="margin-top:14px;max-width:240px">Continuar</button></div>';
+ return h;
+}
+function svgChart(rows){
+ if(rows.length<2)return '<div class="empty">Registra aquest exercici un parell de cops i aquí veuràs la corba de progrés.</div>';
+ const W=340,H=160,Pd=26;
+ const mk=Math.max.apply(null,rows.map(r=>r.kg).concat([1]));
+ const mr=Math.max.apply(null,rows.map(r=>r.reps).concat([1]));
+ const X=i=>Pd+i*(W-2*Pd)/(rows.length-1);
+ const Yk=v=>H-Pd-(v/mk)*(H-2*Pd), Yr=v=>H-Pd-(v/mr)*(H-2*Pd);
+ const pk=rows.map((r,i)=>X(i)+","+Yk(r.kg)).join(" ");
+ const pr=rows.map((r,i)=>X(i)+","+Yr(r.reps)).join(" ");
+ const dots=rows.map((r,i)=>'<circle cx="'+X(i)+'" cy="'+Yk(r.kg)+'" r="3" fill="#3B82FF"/>'+(r.up?'<text x="'+X(i)+'" y="'+(Yk(r.kg)-7)+'" font-size="9" text-anchor="middle" fill="#3B82FF">★</text>':'')).join("");
+ return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'
+  +'<line x1="'+Pd+'" y1="'+(H-Pd)+'" x2="'+(W-Pd)+'" y2="'+(H-Pd)+'" stroke="rgba(160,180,210,.18)"/>'
+  +'<polyline points="'+pr+'" fill="none" stroke="#F4F6F9" stroke-width="1.4" stroke-dasharray="4 3" opacity=".8"/>'
+  +'<polyline points="'+pk+'" fill="none" stroke="#3B82FF" stroke-width="2"/>'+dots
+  +'<text x="'+Pd+'" y="12" font-size="9" fill="#93A0B5" font-family="monospace">màx '+mk+' kg · '+mr+' reps tot.</text>'
+  +'<text x="'+Pd+'" y="'+(H-8)+'" font-size="9" fill="#93A0B5" font-family="monospace">'+rows[0].d+'</text>'
+  +'<text x="'+(W-Pd)+'" y="'+(H-8)+'" font-size="9" fill="#93A0B5" font-family="monospace" text-anchor="end">'+rows[rows.length-1].d+'</text></svg>'
+  +'<div style="display:flex;gap:14px;justify-content:center"><span class="mono" style="font-size:9px;color:var(--acc)">— kg màx</span><span class="mono" style="font-size:9px;color:var(--paper)">┄ reps totals</span></div>';
+}
+function vProgres(){
+ const logged=ALL_EX.filter(e=>lastEntries(e.id,1).length);
+ const sel=UI.progSel||(logged[0]?logged[0].id:ALL_EX[0].id);
+ const be=bestEver(sel);
+ const rows=D.history.filter(x=>x.entries[sel]).map(x=>({d:fmtD(x.dateISO),kg:Math.max.apply(null,x.entries[sel].sets.map(s=>s.k||0)),reps:x.entries[sel].sets.reduce((a,s)=>a+(s.r||0),0),up:(x.levelUps||[]).indexOf(sel)>=0,sets:x.entries[sel].sets}));
+ let h='<div class="rise"><select class="sel" data-sel>';
+ Object.values(SESSIONS).forEach(s=>{h+='<optgroup label="'+s.name+'">'+s.ex.map(e=>'<option value="'+e.id+'"'+(e.id===sel?" selected":"")+'>'+esc(e.name)+'</option>').join("")+'</optgroup>'});
+ h+='</select><div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="mono mut">'+esc(EX(sel).name)+'</span><span class="mono acc-c">'+(D.levels[sel]||0)+' niv.'+((be.bk||be.br)?(" · PR "+(be.bk?be.bk+"kg×":"")+be.br):"")+(isStalled(EX(sel))?" · ⚠":"")+'</span></div>'+svgChart(rows)+'</div>';
+ rows.slice().reverse().slice(0,12).forEach(r=>{h+='<div class="hrow"><span class="d">'+r.d+'</span><span class="s">'+r.sets.map(s=>s.r+(s.k?"@"+s.k:"")).join(" · ")+'</span>'+(r.up?'<span class="acc-c">🏆</span>':'')+'</div>'});
+ return h+'</div>';
+}
+function vPla(){
+ let h='<div class="rise"><div class="card"><span class="mono acc-c">Les 6 regles d\'or</span><ol class="rules">'
+  +'<li>Rang complet en totes les sèries amb RIR ≤2 → NIVELL (l\'app t\'ho prescriu sola).</li>'
+  +'<li>RIR 2 en compostos · RIR 1 en aïllaments · última sèrie d\'aïllament pot anar a la fallada.</li>'
+  +'<li>Descans: 2–3 min compostos · 60–90 s aïllaments (en acabar cada sèrie arrenca sol).</li>'
+  +'<li>Eccèntrica 2 s · laterals i rear delts 2-1-2 · bessons 3-2-1 · leg curl ecc. 3 s (l\'onada t\'ho marca).</li>'
+  +'<li>Deload cada 4–6 setmanes: 2 sèries al 70–80%. Pausa llarga (≥14 dies) → readaptació de 8 dies.</li>'
+  +'<li>Bessons 4×/setmana amb stretch complet · dominades fins a 4 sèries quan surtin netes.</li></ol></div>';
+ Object.keys(SESSIONS).forEach(k=>{
+  const s=SESSIONS[k];const open=UI.planOpen===k;
+  h+='<div class="acc2"><button data-a="plan" data-k="'+k+'"><span><span class="ti">'+s.name+'</span><span class="fo">'+s.focus+'</span></span><span class="mut" style="transform:rotate('+(open?180:0)+'deg);display:inline-block;transition:transform .35s var(--spring)">▾</span></button>';
+  if(open){h+='<div class="accbody">'+s.ex.map((e,i)=>'<div class="exline"><div class="r1"><span class="mono" style="font-size:10px;color:var(--mut)">'+String(i+1).padStart(2,"0")+'</span><span class="n">'+esc(e.name)+(e.star?' <span class="acc-c">★</span>':'')+'</span><span class="t">'+e.sets+'×'+e.rep[0]+'–'+e.rep[1]+(e.time?"s":"")+' · '+esc(e.tempo)+'</span></div><div class="tech">'+esc(e.tech)+' <span class="mono" style="font-size:9px">('+esc(e.rirT)+' · descans '+fmtT(e.rest)+')</span></div></div>').join("")+'</div>'}
+  h+='</div>';
+ });
+ h+='<div class="card"><span class="mono acc-c">Còpia de seguretat</span><p style="font-size:13px;color:var(--mut);margin:10px 0;line-height:1.55">Les dades viuen al dispositiu (IndexedDB + còpia a localStorage) — sense núvol, sense IA. Exporta un .json de tant en tant.</p>'
+  +'<div style="display:flex;gap:10px"><button class="btn btn-line" data-a="export" style="flex:1">⬇ Exportar</button><button class="btn btn-line" data-a="import" style="flex:1">⬆ Importar</button></div></div>';
+ h+='<p style="font-size:12px;color:var(--mut);margin-bottom:14px;line-height:1.5">Consell iPhone: fes servir sempre la icona de pantalla d\'inici. L\'app funciona offline un cop instal·lada.</p>';
+ h+='<button class="btn btn-line" data-a="reset" style="margin-bottom:22px;'+(UI.resetArm?'color:var(--bad);box-shadow:0 0 0 1.5px rgba(255,92,92,.5), var(--sh1)':'')+'">🗑 '+(UI.resetArm?"Segur? Toca un altre cop per esborrar-ho tot":"Esborrar totes les dades")+'</button></div>';
+ return h;
+}
+function vSettings(){
+ return '<div class="over" data-a="closeover"><div class="osheet glass" data-stop="1"><span class="mono acc-c">Ajustos</span>'
+  +'<div class="srow" data-a="togglesound" role="button"><span>So del pacer i avisos</span><span class="sw'+(D.set&&D.set.sound?" on":"")+'"><i></i></span></div>'
+  +'<div class="srow" data-a="cycleprep" role="button"><span>Compte enrere abans de la sèrie</span><span class="mono acc-c" style="font-size:13px">'+((D.set&&D.set.prep)||6)+' s ›</span></div>'
+  +'<div class="srow"><span>Pantalla encesa durant l\'entreno</span><span class="mono mut" style="font-size:10px">automàtic</span></div>'
+  +'<div class="srow" data-a="replayonb" role="button"><span>Tornar a veure la introducció</span><span class="mono mut">›</span></div>'
+  +'<p style="font-size:11.5px;color:var(--mut);margin-top:16px;line-height:1.55">Companion v7 · dades només al teu dispositiu · còpia de seguretat al tab Pla.</p>'
+  +'<button class="btn btn-line" data-a="closeover" style="margin-top:14px">Tancar</button></div></div>';
+}
+function vOnboard(){
+ const st=UI.onb||0;
+ const steps=[
+  {ic:'<span style="color:var(--acc)">'+icon("today",46)+'</span>',t:"El pla pensa per tu",d:"Cada dia et dic la sessió que toca i, exercici a exercici, què has de fer exactament: pes, sèries i repeticions. Tu només executes."},
+  {ic:'<div class="fig-s" style="margin:0 auto">'+figStatic(SESSIONS.LEGS_A.ex[0],86)+'</div>',t:"Segueix l\'onada",d:"El ninot et mostra el moviment i l\'onada et marca el tempo amb so. En triar el RIR, la sèrie es desa i el descans arrenca sol."},
+  {ic:'<span style="color:var(--acc)">'+icon("chart",46)+'</span>',t:"RIR honest = progrés",d:"Amb les teves dades calculo nivells, detecto estancaments i gestiono deloads i retorns de pauses. Sigues honest amb el RIR — de la resta me n\'encarrego jo."}
+ ];
+ const s=steps[st];
+ return '<div class="over" style="align-items:center"><div class="osheet glass" data-stop="1" style="border-radius:28px;max-width:340px;margin:0 18px;text-align:center;padding:32px 26px">'
+  +'<div style="display:flex;justify-content:center">'+s.ic+'</div>'
+  +'<div class="disp" style="font-size:24px;margin-top:18px;letter-spacing:-.5px">'+s.t+'</div>'
+  +'<p style="font-size:14px;color:var(--mut);line-height:1.65;margin-top:10px">'+s.d+'</p>'
+  +'<div style="display:flex;gap:7px;justify-content:center;margin:20px 0">'+steps.map(function(x,i){return '<i class="obdot'+(i===st?" on":"")+'"></i>'}).join("")+'</div>'
+  +'<button class="btn btn-acc" data-a="onbnext">'+(st<2?"Següent":"Som-hi ▶")+'</button>'
+  +(st<2?'<button class="btn btn-ghost" data-a="onbskip" style="margin-top:10px">Saltar</button>':'')
+  +'</div></div>';
+}
+function vShell(){
+ const now=new Date();
+ const dlab=["dg","dl","dt","dc","dj","dv","ds"][now.getDay()]+" "+now.getDate()+" "+["gen","feb","mar","abr","mai","jun","jul","ago","set","oct","nov","des"][now.getMonth()];
+ const tabs=[["avui","Avui","today"],["progres","Progrés","chart"],["pla","Pla","book"]];
+ return '<div class="wrap"><header class="top"><div><div class="disp" style="font-size:19px;color:var(--paper);line-height:1.1;letter-spacing:-.4px">THE HOLLYWOOD <span class="acc-c">PROTOCOL</span></div><span class="mono" style="font-size:9.5px;color:var(--mut)">Companion v7 · '+dlab+'</span></div><button class="fx" data-a="settings" aria-label="Ajustos" style="width:46px;height:46px;border-radius:14px">'+icon("gear")+'</button></header>'
+  +(UI.tab==="avui"?vHome():UI.tab==="progres"?vProgres():vPla())+'</div>'
+  +'<nav class="tabs">'+tabs.map(function(t){return '<button data-a="tab" data-v="'+t[0]+'" class="'+(UI.tab===t[0]?"on":"")+'"><span class="ic">'+icon(t[2],19)+'</span>'+t[1]+'</button>'}).join("")+'</nav>'
+  +(UI.over==="set"?vSettings():"")+(UI.over==="onb"?vOnboard():"");
+}
+function render(){
+ const el=document.getElementById("app");
+ const apply=function(){
+  let h;
+  if(UI.summary)h=vSummary();
+  else if(UI.workout){
+   if(UI.workout.phase==="rest")h=vRest();
+   else if(UI.workout.phase==="finish")h=vFinish();
+   else h=vFocus();
+  }else h=vShell();
+  el.innerHTML=h;
+  if(UI.workout&&UI.workout.phase==="set"){wheelInit();kickFrame()}
+ };
+ if(document.startViewTransition&&!P&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  document.startViewTransition(apply);
+ }else apply();
+}
+
+/* ================= Esdeveniments ================= */
+document.addEventListener("click",function(e){
+ const stop=e.target.closest("[data-stop]");
+ const t=e.target.closest("[data-a]");if(!t)return;
+ const a=t.dataset.a;
+ if(a==="closeover"&&stop&&t.classList&&t.classList.contains("over"))return;
+ if(a==="tab"){UI.tab=t.dataset.v;render()}
+ else if(a==="start"){ensureAudio();startWorkout()}
+ else if(a==="cant"){UI.cant=!UI.cant;render()}
+ else if(a==="restdone"){D.cycleIndex=(D.cycleIndex+1)%8;save();render()}
+ else if(a==="deload")startDeload();
+ else if(a==="reentry")startReentry();
+ else if(a==="sumok"){UI.summary=null;render()}
+ else if(a==="plan"){UI.planOpen=UI.planOpen===t.dataset.k?null:t.dataset.k;render()}
+ else if(a==="export")exportData();
+ else if(a==="import")document.getElementById("impfile").click();
+ else if(a==="reset"){
+  if(UI.resetArm){D=fresh();save();UI.resetArm=0;UI.planOpen=null;render()}
+  else{UI.resetArm=1;render();setTimeout(function(){if(UI.resetArm){UI.resetArm=0;render()}},4000)}
+ }
+ else if(a==="exit"){
+  if(UI.exitArm){pacerStop(false);if(UI.workout.restIv)clearInterval(UI.workout.restIv);wakeOff();UI.workout=null;D.draft=null;save();UI.exitArm=0;UI.over=null;render()}
+  else{UI.exitArm=1;render();setTimeout(function(){if(UI.exitArm){UI.exitArm=0;render()}},3000)}
+ }
+ else if(a==="list"){UI.over="list";render()}
+ else if(a==="plates"){UI.over="plates";render()}
+ else if(a==="closeover"){UI.over=null;render()}
+ else if(a==="settings"){UI.over="set";render()}
+ else if(a==="togglesound"){if(!D.set)D.set={sound:1};D.set.sound=D.set.sound?0:1;save();render()}
+ else if(a==="cycleprep"){if(!D.set)D.set={sound:1};const pp=D.set.prep||6;D.set.prep=pp>=7?5:pp+1;save();render()}
+ else if(a==="replayonb"){UI.onb=0;UI.over="onb";render()}
+ else if(a==="onbnext"){if((UI.onb||0)<2){UI.onb=(UI.onb||0)+1;render()}else{D.onboarded=1;save();UI.onb=0;UI.over=null;render()}}
+ else if(a==="onbskip"){D.onboarded=1;save();UI.onb=0;UI.over=null;render()}
+ else if(a==="jump"){UI.over=null;gotoPos({ei:+t.dataset.i,si:0})}
+ else if(a==="info"){UI.workout.info=!UI.workout.info;render()}
+ else if(a==="pacer"){if(P)pacerStop(true);else pacerStart()}
+ else if(a==="rir"){ensureAudio();commitSet(+t.dataset.r)}
+ else if(a==="clearset")clearSet();
+ else if(a==="prev")navStep(-1);
+ else if(a==="next")navStep(1);
+ else if(a==="addset"){const d=curDraft();d.sets.push({r:d.sets[d.sets.length-1].r,k:d.sets[d.sets.length-1].k,rir:null});delete UI.workout.verdicts[curEx().id];saveDraft();render()}
+ else if(a==="plus30")restPlus30();
+ else if(a==="restundo")restUndo();
+ else if(a==="skiprest")restAdvance();
+ else if(a==="gofinish"){UI.over=null;finishWorkout()}
+});
+document.addEventListener("change",function(e){
+ const t=e.target;
+ if(t.dataset.sel!==undefined){UI.progSel=t.value;render()}
+ if(t.id==="impfile"&&t.files&&t.files[0]){
+  const fr=new FileReader();
+  fr.onload=function(){try{const obj=JSON.parse(fr.result);if(!obj||!Array.isArray(obj.history))throw 0;D=Object.assign(fresh(),obj);save();render();alert("Dades importades ✓")}catch(err){alert("Aquest fitxer no sembla una còpia vàlida.")}};
+  fr.readAsText(t.files[0]);t.value="";
+ }
+});
+let swX=null,swY=null;
+document.addEventListener("touchstart",function(e){if(UI.workout&&UI.workout.phase==="set"&&!e.target.closest(".wheel")){swX=e.touches[0].clientX;swY=e.touches[0].clientY}},{passive:true});
+document.addEventListener("touchend",function(e){
+ if(swX==null||!UI.workout||UI.workout.phase!=="set")return;
+ const dx=e.changedTouches[0].clientX-swX,dy=e.changedTouches[0].clientY-swY;
+ swX=null;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){if(dx<0)navStep(1);else navStep(-1)}
+},{passive:true});
+
+/* ================= PWA ================= */
+function makeIcon(size){
+ const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");
+ const u=size/512;
+ x.fillStyle="#0E1320";x.fillRect(0,0,size,size);
+ x.fillStyle="#3B82FF";
+ x.beginPath();x.roundRect(86*u,150*u,340*u,260*u,40*u);x.fill();
+ x.save();x.translate(86*u,108*u);
+ x.beginPath();x.roundRect(0,0,340*u,52*u,18*u);x.fill();
+ x.fillStyle="#0E1320";
+ for(let i=0;i<5;i++){x.save();x.translate((28+i*68)*u,6*u);x.rotate(.42);x.fillRect(0,0,22*u,52*u);x.restore()}
+ x.restore();
+ x.fillStyle="#F4F6F9";x.font="800 "+Math.round(150*u)+"px Inter, Arial";x.textAlign="center";x.textBaseline="middle";
+ x.fillText("HP",size/2,300*u);
+ return c.toDataURL("image/png");
+}
+function setupPWA(){
+ try{
+  const i512=makeIcon(512),i192=makeIcon(192);
+  const l=document.createElement("link");l.rel="apple-touch-icon";l.href=i192;document.head.appendChild(l);
+  const man={name:"The Hollywood Protocol",short_name:"Protocol",start_url:".",scope:".",display:"standalone",background_color:"#0E1320",theme_color:"#0E1320",icons:[{src:i192,sizes:"192x192",type:"image/png"},{src:i512,sizes:"512x512",type:"image/png"}]};
+  const ml=document.createElement("link");ml.rel="manifest";ml.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:"application/json"}));document.head.appendChild(ml);
+ }catch(e){}
+ if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){
+  navigator.serviceWorker.register("./sw.js").catch(function(){});
+ }
+}
+(async function(){
+ await initStore();
+ if(!D.onboarded)UI.over="onb";
+ render();
+ setupPWA();
+})();
+</script>
+</body>
+</html>
