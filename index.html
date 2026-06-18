@@ -342,6 +342,20 @@ button[role="switch"] .sw{pointer-events:none}
 
 /* iOS dynamic viewport: evita el desajust sota la barra de Safari (iPhone 15) */
 @supports (height:100dvh){body{min-height:100dvh}.sumwrap{min-height:100dvh}}
+
+/* —— editor de correcció de l'última sessió —— */
+.elex{margin-top:16px}
+.eln{font-size:13.5px;font-weight:700;color:var(--txt);margin-bottom:6px;letter-spacing:-.2px}
+.elset{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--hair);flex-wrap:wrap}
+.elsi{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut2);width:50px;flex-shrink:0}
+.elf{display:flex;flex-direction:column;gap:3px}
+.elf>span{font-family:var(--mono);font-size:8px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut2);padding-left:3px}
+.editinp{width:58px;height:44px;border-radius:13px;background:var(--surf2);box-shadow:var(--sh1);border:1.5px solid transparent;color:var(--txt);font-family:var(--mono);font-size:16px;font-weight:600;text-align:center;-webkit-appearance:none;appearance:none}
+.editinp:focus{outline:none;border-color:var(--accbr);background:rgba(255,255,255,.06)}
+.elrirwrap{display:flex;gap:5px;margin-left:auto}
+.elrir{width:34px;height:44px;min-width:34px;border-radius:13px;background:var(--surf2);box-shadow:var(--sh1);font-family:var(--mono);font-size:13px;font-weight:600;color:var(--mut)}
+.elrir.on{background:var(--acc);color:#fff;box-shadow:var(--shacc)}
+.sess.tap{width:100%;text-align:left}
 </style>
 </head>
 <body>
@@ -496,7 +510,7 @@ function sanitizeData(obj){
  base.v=10;base.onboarded=obj.onboarded?1:0;base.cycleIndex=Math.round(clamp(obj.cycleIndex,0,999,0))%CYCLE.length;
  base.startDate=validISO(obj.startDate)?obj.startDate:todayISO();base.lastBackup=validISO(obj.lastBackup)?obj.lastBackup:null;base.lastDeload=validISO(obj.lastDeload)?obj.lastDeload:base.startDate;base.deloadUntil=validISO(obj.deloadUntil)?obj.deloadUntil:null;base.deloadMode=(obj.deloadMode==="reentry"||obj.deloadMode==="deload")?obj.deloadMode:null;
  base.levels={};if(obj.levels&&typeof obj.levels==="object")Object.keys(obj.levels).slice(0,ALL_EX.length).forEach(id=>{if(EX(id))base.levels[id]=Math.round(clamp(obj.levels[id],0,999,0))});
- base.history=Array.isArray(obj.history)?obj.history.map(h=>{const entries=sanitizeEntries(h&&h.entries);if(!Object.keys(entries).length)return null;return{id:Math.round(clamp(h.id,0,Number.MAX_SAFE_INTEGER,Date.now())),dateISO:validISO(h.dateISO)?h.dateISO:todayISO(),sessionKey:SESSIONS[h.sessionKey]?h.sessionKey:"PUSH_A",deload:!!h.deload,entries,levelUps:Array.isArray(h.levelUps)?h.levelUps.filter(id=>EX(id)).slice(0,50):[],dec:sanitizeDec(h.dec),dur:Math.round(clamp(h.dur,1,400,1))}}).filter(Boolean).slice(-1500):[];
+ base.history=Array.isArray(obj.history)?obj.history.map(h=>{const entries=sanitizeEntries(h&&h.entries);if(!Object.keys(entries).length)return null;return{id:Math.round(clamp(h.id,0,Number.MAX_SAFE_INTEGER,Date.now())),dateISO:validISO(h.dateISO)?h.dateISO:todayISO(),sessionKey:SESSIONS[h.sessionKey]?h.sessionKey:"PUSH_A",deload:!!h.deload,soft:!!h.soft,entries,levelUps:Array.isArray(h.levelUps)?h.levelUps.filter(id=>EX(id)).slice(0,50):[],dec:sanitizeDec(h.dec),dur:Math.round(clamp(h.dur,1,400,1))}}).filter(Boolean).slice(-1500):[];
  const draft=sanitizeDraft(obj.draft);if(draft)base.draft=draft;
  return base;
 }
@@ -978,7 +992,7 @@ function finishWorkout(force){
  const shortN=n=>n.split(" (")[0].split(" ·")[0];const an={up:[],down:[],easy:[]};
  Object.keys(dec).forEach(id=>{const c=dec[id],nm=shortN(EX(id).name);if((c==="level"||c==="levelBig")&&ups.indexOf(id)>=0)an.up.push(nm);else if(c==="addset")an.up.push(nm);else if(c==="down")an.down.push(nm);else if(c==="easy")an.easy.push(nm)});
  ups.forEach(id=>{D.levels[id]=(D.levels[id]||0)+1});
- D.history.push({id:Date.now(),dateISO:todayISO(),sessionKey:w.sk,deload:!!deloadActive(),entries,levelUps:ups,dec,dur});
+ D.history.push({id:Date.now(),dateISO:todayISO(),sessionKey:w.sk,deload:!!deloadActive(),soft:!!w.soft,entries,levelUps:ups,dec,dur});
  D.cycleIndex=(D.cycleIndex+1)%8;
  if(gBefore!=null&&gBefore>=7)D.lastDeload=todayISO();
  D.draft=null;save();
@@ -1004,7 +1018,7 @@ function buildSummary(){
 
 /* ===================== overlays / sheets (arrastrar para cerrar) ===================== */
 function openSheet(html){const host=document.getElementById("overlay-host");UI.lastFocus=document.activeElement;host.innerHTML='<div class="scrim" data-a="closeover"></div><div class="sheet2" role="dialog" aria-modal="true" tabindex="-1">'+html+'</div>';const sh=host.querySelector(".sheet2");const app=document.getElementById("app");if(app)app.setAttribute("aria-hidden","true");requestAnimationFrame(()=>{host.classList.add("show");sh.focus({preventScroll:true})});attachSheetDrag(sh)}
-function closeOver(){const host=document.getElementById("overlay-host");host.classList.remove("show");const app=document.getElementById("app");if(app)app.removeAttribute("aria-hidden");setTimeout(()=>{host.innerHTML="";try{if(UI.lastFocus&&UI.lastFocus.focus)UI.lastFocus.focus({preventScroll:true})}catch(e){}},260);UI.over=null}
+function closeOver(){const host=document.getElementById("overlay-host");host.classList.remove("show");const app=document.getElementById("app");if(app)app.removeAttribute("aria-hidden");setTimeout(()=>{host.innerHTML="";try{if(UI.lastFocus&&UI.lastFocus.focus)UI.lastFocus.focus({preventScroll:true})}catch(e){}},260);UI.over=null;UI.editLast=null}
 function trapSheetFocus(e){const sh=document.querySelector("#overlay-host .sheet2");if(!sh)return;const f=Array.from(sh.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(x=>!x.disabled&&x.offsetParent!==null);if(!f.length){e.preventDefault();sh.focus();return}const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
 document.addEventListener("keydown",e=>{const host=document.getElementById("overlay-host");if(!host)return;if(e.key==="Escape"&&host.classList.contains("show"))closeOver();else if(e.key==="Tab"&&host.classList.contains("show"))trapSheetFocus(e)});
 function attachSheetDrag(sh){let y0=null,dy=0;sh.addEventListener("touchstart",e=>{if(sh.scrollTop>2)return;y0=e.touches[0].clientY;dy=0;sh.style.transition="none"},{passive:true});sh.addEventListener("touchmove",e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform="translateY("+dy+"px)"},{passive:true});sh.addEventListener("touchend",()=>{if(y0==null)return;sh.style.transition="";sh.style.transform="";if(dy>110){closeOver();haptic("sel")}y0=null},{passive:true})}
@@ -1138,7 +1152,7 @@ function buildProgress(){
  const lvHtml=lv.length?`<div class="scrtitle">${icon("flame",12)} Nivells per exercici</div><div class="chartcard" style="padding-top:4px;padding-bottom:4px">${lv.map(p=>{const e=EX(p[0]);return e?`<div class="lvrow"><span class="n">${esc(e.name.split(" (")[0])}</span><span class="c">${icon("flame",13)} ×${p[1]}</span></div>`:""}).join("")}</div>`:"";
  const st=stalledList();
  const stHtml=st.length?`<div class="scrtitle">Atenció · estancats</div><div class="chartcard"><div class="tagrow">${st.map(e=>`<span class="tag warn">${esc(e.name.split(" ·")[0].split(" (")[0])}</span>`).join("")}</div><div class="note">Tenen indicació especial al pròxim entreno (micro-salt forçat, sèrie extra o treure llast).</div></div>`:"";
- const recent=H.slice(-8).reverse().map(s=>{const nm=(SESSIONS[s.sessionKey]||{name:s.sessionKey}).name;const ups=(s.levelUps||[]).length;return `<div class="sess"><span class="d">${fmtD(s.dateISO)}</span><span class="sn">${esc(nm)}${s.deload?` · <span class="mono" style="color:var(--warn)">deload</span>`:""}</span>${ups?`<span class="up">${icon("flame",12)} ${ups}</span>`:`<span class="sx">${s.dur||"·"} min</span>`}</div>`}).join("");
+ const recent=H.slice(-8).reverse().map((s,ri)=>{const nm=(SESSIONS[s.sessionKey]||{name:s.sessionKey}).name;const ups=(s.levelUps||[]).length;const inner=`<span class="d">${fmtD(s.dateISO)}</span><span class="sn">${esc(nm)}${s.deload?` · <span class="mono" style="color:var(--warn)">deload</span>`:""}</span>${ups?`<span class="up">${icon("flame",12)} ${ups}</span>`:`<span class="sx">${s.dur||"·"} min</span>`}`;return ri===0?`<button class="sess tap" data-a="joeditlast" data-from="progres" aria-label="Corregir l'última sessió">${inner}<span class="sx" style="margin-left:8px;color:var(--acc2)">${icon("weight",12)} editar</span></button>`:`<div class="sess">${inner}</div>`}).join("");
  swap(`<div class="wrap">
   <header class="top"><div class="brand"><div class="slate">${icon("chart",13)} Progrés</div><h1>El teu rastre</h1><div class="sub">${H.length} sessions registrades</div></div></header>
   <div class="stats"><div class="stat"><b>${H.length}</b><span>Sessions</span></div><div class="stat"><b>${days}</b><span>Dies entrenats</span></div><div class="stat"><b>${totLv}</b><span>Pujades nivell</span></div></div>
@@ -1189,7 +1203,7 @@ function buildJo(){
   <div class="scrtitle">Recuperació</div>
   <div class="chartcard"><button class="btn btn-gold tap" data-a="jodeload" style="margin-bottom:10px">Activar deload (8 dies)</button><button class="btn btn-line tap" data-a="joreentry">Activar readaptació (8 dies)</button>${deloadActive()?`<div class="note">Actiu fins al ${fmtD(D.deloadUntil)}.</div>`:""}</div>
   <div class="scrtitle">Dades</div>
-  <div class="chartcard"><button class="btn btn-ink tap" data-a="joexport" style="margin-bottom:10px">${icon("undo",15)} Exportar còpia (.json)</button><button class="btn btn-line tap" data-a="joexportcsv" style="margin-bottom:10px">Exportar historial (.csv)</button><button class="btn btn-line tap" data-a="joimport" style="margin-bottom:10px">Importar còpia</button><button class="btn btn-line tap" data-a="joundo" style="margin-bottom:10px">Desfer última sessió</button><button class="btn btn-ghost tap" data-a="joreset" style="color:var(--bad);border-color:rgba(255,100,100,.4)">Esborrar totes les dades</button>
+  <div class="chartcard"><button class="btn btn-ink tap" data-a="joexport" style="margin-bottom:10px">${icon("undo",15)} Exportar còpia (.json)</button><button class="btn btn-line tap" data-a="joexportcsv" style="margin-bottom:10px">Exportar historial (.csv)</button><button class="btn btn-line tap" data-a="joimport" style="margin-bottom:10px">Importar còpia</button><button class="btn btn-line tap" data-a="joeditlast" data-from="jo" style="margin-bottom:10px">Corregir pesos de l'última sessió</button><button class="btn btn-line tap" data-a="joundo" style="margin-bottom:10px">Desfer última sessió</button><button class="btn btn-ghost tap" data-a="joreset" style="color:var(--bad);border-color:rgba(255,100,100,.4)">Esborrar totes les dades</button>
    <div class="note">Estat: ${storageOK?"desant correctament al dispositiu":`<span style="color:var(--bad)">no es pot desar (mode privat?)</span>`}${D.lastBackup?` · última còpia ${fmtD(D.lastBackup)}`:" · sense còpia encara"}.</div></div>
   <div class="scrtitle">Sobre l'app</div>
   <div class="chartcard"><div class="note" style="margin-top:0"><b>Companion v10.1 Final · build auditada.</b> Capa visual original conservada amb persistència robusta, drafts complets, importació validada, mode rendiment, export CSV segur i millores de focus/accessibilitat.<br><br><b>Vibració a iOS:</b> el web només permet resposta tàctil mínima. La háptica completa del Taptic Engine arriba amb la versió nativa (Capacitor). El temporitzador en segon pla es reconcilia en tornar a primer pla; l'alarma fiable amb pantalla bloquejada també és nativa.</div></div>
@@ -1203,6 +1217,60 @@ function undoLastSession(){
  (h.levelUps||[]).forEach(id=>{if(D.levels[id])D.levels[id]=Math.max(0,D.levels[id]-1)});
  D.cycleIndex=(D.cycleIndex+7)%8;
  D.draft=null;save();closeOver();showToast(icon("undo",16),"Última sessió desfeta");buildJo();
+}
+
+/* ===================== Corregir l'última sessió ===================== */
+/* Permet rectificar pes / reps / RIR de l'última sessió ja desada (p. ex. un
+   pes mal anotat). En desar, es recalculen els veredictes i es reconcilien les
+   pujades de nivell d'aquesta sessió (respectant deload i sessions suaus). */
+function editLastSession(from){
+ if(!D.history.length){showToast(icon("list",16),"No hi ha cap sessió per corregir");return}
+ const idx=D.history.length-1,h=D.history[idx],S=SESSIONS[h.sessionKey];
+ if(!S){showToast(icon("close",16),"Sessió desconeguda");return}
+ const sets={};
+ S.ex.forEach(ex=>{const e=h.entries&&h.entries[ex.id];if(e&&Array.isArray(e.sets)&&e.sets.length)sets[ex.id]=e.sets.map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir}))});
+ if(!Object.keys(sets).length){showToast(icon("close",16),"Aquesta sessió no té sèries registrades");return}
+ UI.editLast={idx,sk:h.sessionKey,from:from||"jo",sets};
+ openSheet(editLastHTML());
+}
+function editLastHTML(){
+ const h=D.history[UI.editLast.idx],S=SESSIONS[UI.editLast.sk];
+ let html='<div class="sheetlbl">'+icon("weight",12)+" Corregir l'última sessió</div>";
+ html+='<div class="note" style="margin-top:10px"><b>'+esc(S.name)+' · '+fmtD(h.dateISO)+'</b><br>Ajusta el pes, les reps o el RIR de qualsevol sèrie si vas registrar alguna cosa malament. Els nivells i la progressió es recalculen sols en desar.</div>';
+ S.ex.forEach(ex=>{
+  const work=UI.editLast.sets[ex.id];if(!work)return;
+  const unit=ex.time?"s":"reps",nm=esc(ex.name.split(" (")[0]);
+  html+='<div class="elex"><div class="eln">'+nm+(ex.star?' <span class="acc-c">★</span>':"")+'</div>';
+  work.forEach((s,i)=>{
+   html+='<div class="elset"><span class="elsi">Sèrie '+(i+1)+'</span>'
+    +'<label class="elf"><span>kg</span><input class="editinp" type="text" inputmode="decimal" enterkeyhint="done" data-x="'+ex.id+'" data-s="'+i+'" data-f="k" value="'+s.k+'" aria-label="Pes sèrie '+(i+1)+'"></label>'
+    +'<label class="elf"><span>'+unit+'</span><input class="editinp" type="text" inputmode="numeric" enterkeyhint="done" data-x="'+ex.id+'" data-s="'+i+'" data-f="r" value="'+s.r+'" aria-label="Reps sèrie '+(i+1)+'"></label>'
+    +'<div class="elrirwrap" id="elr_'+ex.id+'_'+i+'" role="group" aria-label="RIR sèrie '+(i+1)+'">'
+    +[0,1,2,3].map(v=>'<button class="elrir tap'+(s.rir===v?" on":"")+'" data-a="elrir" data-x="'+ex.id+'" data-s="'+i+'" data-r="'+v+'" aria-pressed="'+(s.rir===v?"true":"false")+'">'+(v===3?"3+":v)+'</button>').join("")
+    +'</div></div>';
+  });
+  html+='</div>';
+ });
+ html+='<div class="rbtns" style="margin-top:20px"><button class="fnav tap" data-a="closeover">Cancel·lar</button><button class="fnav tap" data-a="elsave" style="background:var(--accso);color:var(--acc2)">Desar canvis</button></div>';
+ return html;
+}
+function elSetRir(x,si,r){const arr=UI.editLast&&UI.editLast.sets[x];if(!arr||!arr[si])return;arr[si].rir=r;const wrap=document.getElementById("elr_"+x+"_"+si);if(wrap){wrap.querySelectorAll("[data-a='elrir']").forEach(b=>{const on=(+b.dataset.r===r);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false")})}haptic("sel")}
+function applyEditLast(){
+ if(!UI.editLast){closeOver();return}
+ const sh=document.querySelector("#overlay-host .sheet2");
+ if(sh)sh.querySelectorAll(".editinp").forEach(inp=>{const x=inp.dataset.x,si=+inp.dataset.s,f=inp.dataset.f,arr=UI.editLast.sets[x];if(arr&&arr[si]){let v=parseFloat(String(inp.value).replace(",","."));if(!Number.isFinite(v))v=0;arr[si][f]=v}});
+ const from=UI.editLast.from,idx=UI.editLast.idx,h=D.history[idx];
+ if(!h){UI.editLast=null;closeOver();return}
+ const S=SESSIONS[h.sessionKey],newEntries={};
+ S.ex.forEach(ex=>{const work=UI.editLast.sets[ex.id];if(!work)return;const sets=work.map(cleanSet).filter(s=>s.r>0).map(s=>({r:s.r,k:s.k,rir:s.rir}));if(sets.length)newEntries[ex.id]={sets}});
+ if(!Object.keys(newEntries).length){showToast(icon("close",16),"Deixa almenys una sèrie amb reps > 0");return}
+ const blockUps=!!h.deload||!!h.soft,oldUps=new Set(h.levelUps||[]),newUps=[],dec={};
+ S.ex.forEach(ex=>{const e=newEntries[ex.id];if(!e)return;const logged=e.sets.filter(s=>s.r>0&&s.rir!=null);const vv=evalExercise(ex,logged);if(vv){dec[ex.id]=vv.code;if(vv.up&&!blockUps)newUps.push(ex.id)}});
+ const newUpSet=new Set(newUps);
+ S.ex.forEach(ex=>{const id=ex.id,was=oldUps.has(id),now=newUpSet.has(id);if(was&&!now)D.levels[id]=Math.max(0,(D.levels[id]||0)-1);else if(!was&&now)D.levels[id]=(D.levels[id]||0)+1});
+ h.entries=newEntries;h.levelUps=newUps;h.dec=dec;
+ UI.editLast=null;save();closeOver();haptic("ok");showToast(icon("check",16),"Última sessió corregida");
+ if(from==="progres")buildProgress();else if(from==="jo")buildJo();else if(!UI.workout&&!UI.summary)buildHome();
 }
 
 /* ===================== Importar dades ===================== */
@@ -1258,6 +1326,9 @@ document.addEventListener("click",e=>{
   case "joreentry":startReentry();showToast(icon("check",16),"Readaptació activada · 8 dies");buildJo();break;
   case "jocyclefwd":D.cycleIndex=(D.cycleIndex+1)%8;save();haptic("sel");buildJo();break;
   case "jocycleback":D.cycleIndex=(D.cycleIndex+7)%8;save();haptic("sel");buildJo();break;
+  case "joeditlast":editLastSession(t.dataset.from||"jo");break;
+  case "elrir":elSetRir(t.dataset.x,+t.dataset.s,+t.dataset.r);break;
+  case "elsave":applyEditLast();break;
  }
 });
 
