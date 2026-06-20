@@ -20,7 +20,6 @@
   --txt:#EFF3F8; --mut:#9AA7BA; --mut2:#8C99AE;
   --acc:#3B82FF; --acc2:#5B9BFF; --accso:rgba(59,130,255,.16); --accbr:rgba(59,130,255,.5);
   --accgrad:linear-gradient(165deg,#5B9BFF 0%,#3B82FF 55%,#2D6FF0 100%);
-  /* marca pròpia: or de "call sheet" / hora daurada — la identitat cinematogràfica que faltava */
   --gold:#E8B45A; --gold-dim:rgba(232,180,90,.13); --gold-br:rgba(232,180,90,.4);
   --ok:#41D6A8; --warn:#FFB259; --bad:#FF6464;
   --surf:rgba(255,255,255,.045); --surf2:rgba(255,255,255,.08);
@@ -33,7 +32,6 @@
   --sh2:inset 0 1px 0 rgba(255,255,255,.08), 0 18px 44px rgba(0,0,0,.46), 0 4px 12px rgba(0,0,0,.32);
   --sh3:inset 0 1px 0 rgba(255,255,255,.1), 0 28px 64px rgba(0,0,0,.58), 0 8px 20px rgba(0,0,0,.4);
   --shacc:0 6px 18px rgba(59,130,255,.4), 0 2px 5px rgba(20,40,90,.4), inset 0 1px 0 rgba(255,255,255,.22);
-  /* motor de moviment: ràpid per als gestos, físic per a les celebracions */
   --press:cubic-bezier(.2,0,0,1);
   --spring:cubic-bezier(.34,1.42,.5,1);
   --springb:cubic-bezier(.34,1.56,.64,1);
@@ -49,10 +47,8 @@ body[data-mode="pull"]{background-image:radial-gradient(125% 60% at 50% -10%,rgb
 html,body{overscroll-behavior-y:none}
 body{color:var(--txt);font-family:var(--disp);min-height:100vh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.012em;
  background:#0A0D14;background-image:radial-gradient(125% 60% at 50% -10%,rgba(59,130,255,.14),transparent 58%),radial-gradient(100% 50% at 100% 100%,rgba(45,111,240,.06),transparent 60%),linear-gradient(180deg,#141C2B,#0E1420 45%,#090C13)}
-/* textura fixa SENSE background-attachment:fixed (que fa jank a iOS) */
 .grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 button{font:inherit;background:none;border:none;color:inherit;cursor:pointer;touch-action:manipulation}
-/* accessibilitat: focus visible real (abans no n'hi havia cap) */
 :focus-visible{outline:2.5px solid var(--acc);outline-offset:2px;border-radius:12px}
 .mono{font-family:var(--mono);font-size:11.5px;letter-spacing:.6px;text-transform:uppercase}
 .disp{font-family:var(--disp);font-weight:800;letter-spacing:-.03em}
@@ -60,12 +56,10 @@ button{font:inherit;background:none;border:none;color:inherit;cursor:pointer;tou
 svg .ci{display:inline-flex}
 .ci{display:inline-flex;align-items:center;justify-content:center;vertical-align:-2px}
 
-/* —— motor de pulsació: ràpid (~130ms), no 500ms —— */
 .tap{transition:transform .14s var(--press),filter .14s var(--press),background .2s ease,box-shadow .25s ease}
 .tap:active{transform:scale(.955);filter:brightness(1.09)}
 .tap-sm:active{transform:scale(.9)}
 
-/* transicions de pantalla + element compartit (matched geometry) */
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:var(--easeo)}
 ::view-transition-old(hero-fig),::view-transition-new(hero-fig){animation-duration:.46s;animation-timing-function:var(--spring);mix-blend-mode:normal}
 .hero-fig{view-transition-name:hero-fig;contain:layout}
@@ -73,7 +67,6 @@ svg .ci{display:inline-flex}
 .grain+#app{position:relative;z-index:1}
 .wrap{max-width:520px;margin:0 auto;padding:0 18px 132px;position:relative;z-index:1}
 
-/* —— capçalera "call sheet" (la identitat cinematogràfica) —— */
 header.top{display:flex;align-items:flex-end;justify-content:space-between;padding:calc(20px + env(safe-area-inset-top)) 2px 12px}
 .brand .slate{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;opacity:.9}
 .brand h1{font-family:var(--disp);font-weight:900;font-size:25px;line-height:1;color:var(--paper);margin-top:6px;letter-spacing:-.5px}
@@ -89,13 +82,11 @@ header.top{display:flex;align-items:flex-end;justify-content:space-between;paddi
 .btn-ghost{border:1.5px dashed rgba(110,125,150,.4);color:var(--mut2);font-size:11.5px;letter-spacing:1px}
 .btn-gold{background:var(--gold-dim);color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold-br),var(--sh1);font-size:11.5px}
 
-/* —— coach / "call sheet" del dia —— */
 .coach{position:relative;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--sh1);border-left:2.5px solid var(--gold)}
 .coach .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:7px}
 .coach .cm{font-size:13.5px;margin-top:10px;line-height:1.55;color:var(--txt)}
 .coach .cm.warn{color:var(--warn)}.coach .cm.red{color:var(--bad)}.coach .cm.sage{color:var(--ok)}.coach .cm.hold{color:var(--txt)}
 
-/* today card (hero del dia) amb figura compartida */
 .today{position:relative;display:flex;gap:16px;align-items:center;background:var(--glass2);backdrop-filter:var(--blur2);-webkit-backdrop-filter:var(--blur2);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--sh2)}
 .today .figwrap{width:118px;height:118px;flex-shrink:0;border-radius:24px;background:rgba(9,13,22,.5);box-shadow:inset 0 0 0 1px var(--hair);display:flex;align-items:center;justify-content:center}
 .today .col{flex:1;min-width:0}
@@ -105,13 +96,11 @@ header.top{display:flex;align-items:flex-end;justify-content:space-between;paddi
 .today .meta{display:flex;gap:12px;margin-top:11px;font-family:var(--mono);font-size:10px;color:var(--mut2);flex-wrap:wrap}
 .today .meta b{color:var(--acc2);font-weight:600}
 
-/* fig styling (figures verbatim) */
 .bone{stroke:var(--paper);stroke-width:4;stroke-linecap:round;fill:none}
 .bhead{fill:var(--paper)}
 .prop{stroke:#46608a;stroke-width:3;stroke-linecap:round}
 svg{display:block}
 
-/* stats */
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .stat{position:relative;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:20px;padding:16px 8px;text-align:center;box-shadow:var(--sh1)}
 .stat b{font-family:var(--mono);font-size:23px;font-weight:600;display:block;background:linear-gradient(180deg,#fff,#C8D4E6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -122,12 +111,10 @@ svg{display:block}
 .wring-fg{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s var(--easeo)}
 .wring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--txt)}
 
-/* ============ FOCUS (pantalla d'entreno, render quirúrgic) ============ */
 .focus-screen{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;background:#0A0D14;background-image:radial-gradient(120% 55% at 50% -8%,rgba(59,130,255,.12),transparent 60%),linear-gradient(180deg,#141C2B,#0E1420 45%,#0A0D14)}
 .fhead{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 18px 10px}
 .fhead .fx{width:48px;height:48px;min-width:48px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--mut);border-radius:15px;background:var(--surf);box-shadow:var(--sh1)}
 .fprog{flex:1}
-/* la franja de "call sheet": SCENE / TAKE com en un clap de cinema */
 .fslate{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);justify-content:center}
 .fslate b{color:var(--gold)}
 .fbar{height:5px;background:var(--surf);border-radius:3px;margin-top:7px;overflow:hidden}
@@ -152,7 +139,6 @@ svg{display:block}
 .savedwrap .edited{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.8px;color:var(--ok);text-transform:uppercase}
 .undochip{background:var(--surf2);border-radius:10px;padding:8px 12px;min-height:36px;display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:.5px}
 
-/* onada (pacer) */
 .wave{position:relative;margin:14px -4px 0;height:188px}
 .wave svg{width:100%;height:158px}
 .wpath{fill:none;stroke:rgba(59,130,255,.3);stroke-width:3.5}
@@ -173,7 +159,6 @@ svg{display:block}
 .sug.up{color:var(--ok)}.sug.warn{color:var(--warn)}.sug.down{color:var(--bad)}.sug.hold,.sug.info{color:var(--mut)}
 .last{font-family:var(--mono);font-size:10px;color:var(--mut2);margin-top:9px}
 
-/* rodes (wheel pickers) */
 .fwheels{display:flex;gap:14px;justify-content:center;margin-top:16px}
 .wcol{flex:1;max-width:164px}
 .wlab{font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut2);text-align:center;margin-bottom:8px}
@@ -183,11 +168,9 @@ svg{display:block}
 .witem{height:56px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:26px;color:var(--mut)}
 .wpad{height:56px}
 .wsel{position:absolute;left:12px;right:12px;top:56px;height:56px;border-top:1.5px solid var(--accbr);border-bottom:1.5px solid var(--accbr);pointer-events:none;border-radius:2px}
-/* nudge ±: input ràpid sense fer scroll llarg (resol la fricció de la roda) */
 .nudge{display:flex;justify-content:center;gap:8px;margin-top:8px}
 .nudge button{width:44px;height:40px;min-width:44px;border-radius:12px;background:var(--surf2);color:var(--mut);font-family:var(--mono);font-size:17px;box-shadow:var(--sh1)}
 
-/* RIR */
 .frir{margin-top:18px}
 .frir .rl{font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut2);text-align:center;margin-bottom:10px;line-height:1.6}
 .frirrow{display:flex;gap:10px}
@@ -197,7 +180,6 @@ svg{display:block}
 .ffoot{display:flex;gap:10px;padding:10px 18px calc(14px + env(safe-area-inset-bottom))}
 .fnav{flex:1;height:54px;border-radius:16px;background:var(--surf);color:var(--mut);font-family:var(--mono);font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;box-shadow:var(--sh1);display:flex;align-items:center;justify-content:center;gap:6px}
 
-/* descans (rest overlay) */
 .restwrap{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,11,18,.72);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);padding:22px;animation:restin .42s var(--spring) both}
 .restwrap.out{animation:restout .26s var(--easeo) both}
 @keyframes restin{from{opacity:0}to{opacity:1}}
@@ -225,12 +207,10 @@ svg{display:block}
 .lvlmsg.warn .lt{color:var(--warn)}
 @keyframes stamp{from{opacity:0;transform:scale(1.16) rotate(-2deg)}to{opacity:1;transform:none}}
 
-/* sumari */
 .sumwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;animation:rise .5s var(--spring) both}
 .stamp{position:relative;box-shadow:inset 0 0 0 1.5px var(--gold-br),var(--sh1);color:var(--gold);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left;margin-top:10px;animation:stamp .45s var(--spring) both;background:var(--gold-dim)}
 .anline{font-size:13px;line-height:1.55;margin-top:9px;color:var(--txt)}
 
-/* overlays / bottom sheets amb arrossegar per tancar */
 #overlay-host{position:fixed;inset:0;z-index:50;pointer-events:none}
 #overlay-host.show{pointer-events:auto}
 #overlay-host .scrim{position:absolute;inset:0;background:rgba(6,9,15,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .26s ease}
@@ -250,14 +230,12 @@ svg{display:block}
 .sw.on{background:var(--acc)}.sw.on i{transform:translateX(20px)}
 .note{font-size:11.5px;color:var(--mut2);line-height:1.55;margin-top:14px}
 
-/* tab bar */
 nav.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--glass);backdrop-filter:var(--blur2);-webkit-backdrop-filter:var(--blur2);box-shadow:0 -8px 30px rgba(0,0,0,.4);padding-bottom:env(safe-area-inset-bottom);z-index:16}
 nav.tabs::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--hairlight)}
 nav.tabs button{flex:1;padding:11px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:8.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut2);min-height:56px}
 nav.tabs button.on{color:var(--acc)}
 nav.tabs button.on .ci{transform:scale(1.12);transition:transform .4s var(--spring)}
 
-/* toast */
 #toast-host{position:fixed;left:0;right:0;bottom:calc(88px + env(safe-area-inset-bottom));z-index:60;display:flex;justify-content:center;pointer-events:none}
 .toast{max-width:340px;margin:0 18px;background:linear-gradient(168deg,rgba(34,44,64,.94),rgba(19,26,40,.92));backdrop-filter:var(--blur2);-webkit-backdrop-filter:var(--blur2);border-radius:18px;padding:13px 16px;font-size:13px;line-height:1.45;color:var(--txt);box-shadow:var(--sh2);display:flex;align-items:flex-start;gap:10px;animation:toastin .42s var(--spring) both}
 .toast .ti{flex-shrink:0;color:var(--acc2);display:flex}
@@ -273,7 +251,6 @@ nav.tabs button.on .ci{transform:scale(1.12);transition:transform .4s var(--spri
 }
 .noselect{-webkit-user-select:none;user-select:none}
 
-/* ===== Progrés / Pla / Jo / Onboarding ===== */
 nav.tabs{view-transition-name:tabbar}
 .scrtitle{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--mut2);margin:22px 2px 12px;display:flex;align-items:center;gap:8px}
 .chartcard{position:relative;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:18px 16px;box-shadow:var(--sh1);margin-bottom:14px}
@@ -323,7 +300,6 @@ details.plad[open]>summary .chev{transform:rotate(90deg)}
 .obp b{color:var(--acc2);font-weight:600}
 
 
-/* ===== v10 offline hardening: PWA, accessibility & performance ===== */
 body.perf{--blur:none;--blur2:none;--sh1:inset 0 1px 0 rgba(255,255,255,.045),0 3px 10px rgba(0,0,0,.22);--sh2:inset 0 1px 0 rgba(255,255,255,.06),0 8px 22px rgba(0,0,0,.34);--sh3:inset 0 1px 0 rgba(255,255,255,.08),0 14px 34px rgba(0,0,0,.42)}
 body.perf .grain{display:none}
 body.perf .card,body.perf .today,body.perf .hero,body.perf .coach,body.perf .stat,body.perf .bstat,body.perf .chartcard,body.perf details.plad,body.perf .sheet2,body.perf nav.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,28,44,.94)}
@@ -340,10 +316,8 @@ button[role="switch"] .sw{pointer-events:none}
 
 .statusbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.statuspill{font-family:var(--mono);font-size:9.5px;letter-spacing:.7px;text-transform:uppercase;background:var(--surf);color:var(--mut);border-radius:999px;padding:8px 11px;box-shadow:var(--sh1)}.statuspill.good{color:var(--ok);background:rgba(65,214,168,.1)}.statuspill.warn{color:var(--warn);background:rgba(255,178,89,.1)}
 
-/* iOS dynamic viewport: evita el desajust sota la barra de Safari (iPhone 15) */
 @supports (height:100dvh){body{min-height:100dvh}.sumwrap{min-height:100dvh}}
 
-/* —— editor de correcció de l'última sessió —— */
 .elex{margin-top:16px}
 .eln{font-size:13.5px;font-weight:700;color:var(--txt);margin-bottom:6px;letter-spacing:-.2px}
 .elset{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--hair);flex-wrap:wrap}
@@ -364,12 +338,6 @@ button[role="switch"] .sw{pointer-events:none}
 <div id="overlay-host"></div>
 <div id="toast-host"></div>
 <script>
-/* ===================================================================
-   NÚCLEO TRANSPLANTADO VERBATIM desde Companion v7 (sin cambios).
-   Datos, motor de progresión, tempo, audio e iconos: intactos.
-   =================================================================== */
-
-/* —— Dades del pla + figures (verbatim) —— */
 const SESSIONS={
  PUSH_A:{name:"PUSH A",focus:"Pit · Espatlles ★ · Tríceps · Bessons",dur:"50–60 min",ex:[
   {id:"pa1",fig:"pushup",name:"Flexions inclinades (caixó 30 cm)",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"baixa l'alçada → planes → declinades → xaleco",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Mans al caixó, cos en línia recta del cap als talons. Baixa el pit fins a fregar (2 s) i empeny amb intenció."},
@@ -390,7 +358,7 @@ const SESSIONS={
   {id:"ka1",fig:"squat",name:"Sentadilla amb xaleco",sets:3,rep:[8,12],load:"Xaleco 20 kg",prog:"vest",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peus a l'ample d'espatlles, baixa profund (2 s) amb el tors ferm i empeny amb tot el peu."},
   {id:"ka2",fig:"split",name:"Bulgarian split squat DB",sets:3,rep:[8,10],load:"DB",prog:"kg",star:1,side:"cama",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peu del darrere al banc. Baixa vertical, genoll davanter alineat sobre el peu. DB a les mans."},
   {id:"ka3",fig:"rdl",name:"Romanian deadlift amb barra",sets:3,rep:[8,12],load:"Barra",prog:"kg",rest:150,tempo:"3-0-1",rirT:"RIR 2",tech:"Frontissa de maluc: barra arran de cames, descens de 3 s fins a stretch màxim d'isquios. Lumbar neutra SEMPRE."},
-  {id:"ka4",fig:"bridge",name:"Glute bridge amb barra",sets:3,rep:[12,15],load:"Barra",prog:"kg",rest:90,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Empeny amb els talons, bloqueja el gluti amb pausa d'1 s a dalt. No arquegis la lumbar per pujar més."},
+  {id:"ka4",fig:"bridge",name:"Glute bridge amb barra",sets:3,rep:[12,15],load:"Barra",prog:"kg",rest:90,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Empeny amb els talons, bloqueja el gluti amb pausa d'1 s a dalt. No arquejis la lumbar per pujar més."},
   {id:"ka5",fig:"calf",name:"Bessons · unilateral stretch",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Stretch màxim a baix, puja a la punta, pausa 1 s a dalt. Quan superis 4×15 net: DB a la mà lliure."},
   {id:"ka6",fig:"calf",name:"Bessons · bilateral lent",sets:2,rep:[20,25],load:"PC",prog:"none",rest:75,tempo:"3-2-1",rirT:"fins a cremar",tech:"Tot lent: 3 s baixar, 2 s aguantant l'stretch a baix, 1 s pujar. Bomba final fins a cremar."}]},
  PUSH_B:{name:"PUSH B",focus:"Pit · Espatlles ★ · Tríceps · Core",dur:"50–60 min",ex:[
@@ -406,12 +374,12 @@ const SESSIONS={
   {id:"ub3",fig:"australian",name:"Australian amb peus elevats",sets:3,rep:[8,12],load:"PC",prog:"ladder",ladder:"cos més horitzontal → xaleco",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"Peus al banc: com més horitzontal el cos, més dur. Pit a la barra, cos rígid."},
   {id:"ub4",fig:"rearfly",name:"Rear delt flies (banc inclinat)",sets:4,rep:[12,15],load:"DB lleuger",prog:"kg",star:1,rest:90,tempo:"2-1-2",rirT:"RIR 1 · últ. a 0 opc.",tech:"Pit recolzat al banc inclinat. Obre els braços liderant amb els colzes, pausa 1 s a dalt. Pes < forma."},
   {id:"ub5",fig:"curl",name:"Curl bíceps concentrat",sets:3,rep:[10,12],load:"DB",prog:"kg",side:"braç",rest:90,tempo:"2-0-1",rirT:"RIR 1 · últ. a 0",tech:"Colze contra la part interna de la cuixa. Puja sense moure el braç, baixa en 2 s. Aïllament pur."},
-  {id:"ub6",fig:"calf",name:"Bessons · unilateral",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Tercera sessió de bessons de la setmana. Stretch màxim a baix, pausa 1 s a la punta."}]},
+  {id:"ub6",fig:"calf",name:"Bessins · unilateral",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Tercera sessió de bessons de la setmana. Stretch màxim a baix, pausa 1 s a la punta."}]},
  LEGS_B:{name:"LEGS B",focus:"Isquios ★ · Gluti · Quàdriceps · Core · Bessons",dur:"60–70 min",ex:[
   {id:"kb1",fig:"rdl",name:"RDL unilateral amb DB",sets:3,rep:[8,10],load:"DB",prog:"kg",side:"cama",rest:150,tempo:"3-0-1",rirT:"RIR 2",tech:"Frontissa sobre una cama, maluc quadrat (no s'obre). Descens de 3 s fins a stretch d'isquios, esquena neutra."},
   {id:"kb2",fig:"squat",name:"Sentadilla goblet DB",sets:3,rep:[10,12],load:"DB",prog:"kg",rest:150,tempo:"2-0-1",rirT:"RIR 2",tech:"DB agafat al pit. Baixa profund entre els genolls amb el tors vertical. Menys lumbar que la de dimecres."},
   {id:"kb3",fig:"split",name:"Bulgarian amb pausa 2 s",sets:3,rep:[8,10],load:"DB o xaleco",prog:"kg",side:"cama",rest:150,tempo:"2-2-1",rirT:"RIR 2",tech:"Com el de dimecres però amb pausa de 2 s a baix: més estímul amb menys càrrega."},
-  {id:"kb4",fig:"thrust",name:"Hip thrust al banc amb barra",sets:3,rep:[10,15],load:"Barra",prog:"kg",rest:120,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Esquena alta recolzada al banc. Empeny amb talons fins a extensió completa de maluc, pausa 1 s a dalt."},
+  {id:"kb4",fig:"thrust",name:"Hip thrust al banc amb barra",sets:3,rep:[10,15],load:"Barra",prog:"kg",rest:120,tempo:"2-1-1",rirT:"RIR 1–2",tech:"Esquena alta recolzada al banc. Empeny amb talons fins a extensió completa de malucs, pausa 1 s a dalt."},
   {id:"kb5",fig:"legcurl",name:"Leg curl lliscant · NOU v2",sets:3,rep:[6,10],load:"PC",prog:"ladder",star:1,ladder:"2 cames → només eccèntrica → 1 cama → nòrdic negatiu",rest:90,tempo:"3-0-1",rirT:"RIR 1",tech:"Pont de gluti amb talons sobre tovallola/sliders. Llisca els talons enfora en 3 s i recull. Maluc alt tota l'estona."},
   {id:"kb6",fig:"hollow",name:"Core · hollow body hold",sets:3,rep:[20,40],load:"—",prog:"time",time:1,rest:75,tempo:"isomètric",rirT:"para abans de perdre forma",tech:"Lumbar enganxada a terra, braços i cames esteses. Si la lumbar s'aixeca, plega una mica les cames."},
   {id:"kb7",fig:"calf",name:"Bessons · unilateral",sets:4,rep:[10,15],load:"DB opcional",prog:"kg",side:"cama",rest:75,tempo:"2-1-2",rirT:"RIR 1",tech:"Quarta sessió de bessons: stretch màxim a baix, pausa 1 s a la punta."},
@@ -421,7 +389,6 @@ const CYCLE=["PUSH_A","PULL_A","LEGS_A","REST","PUSH_B","PULL_B","LEGS_B","REST"
 const ALL_EX=Object.values(SESSIONS).flatMap(s=>s.ex);
 const EX=id=>ALL_EX.find(e=>e.id===id);
 
-/* ===== Figures de pals (NO TOCAR: coordenades i lògica intactes) ===== */
 const FIG={
  pushup:{p:[[8,84,92,84]],A:{h:[80,50],n:[72,56],hp:[48,62],k:[36,66],a:[22,72],f:[16,76],e:[72,70],ha:[70,82]},B:{h:[80,64],n:[72,68],hp:[48,72],k:[36,75],a:[22,79],f:[16,82],e:[60,77],ha:[70,82]}},
  dip:{p:[[24,42,36,42],[64,42,76,42]],A:{h:[50,14],n:[50,25],hp:[50,52],k:[45,67],a:[50,80],f:[57,83],e:[60,34],ha:[66,42]},B:{h:[52,26],n:[52,37],hp:[52,62],k:[47,76],a:[52,88],f:[59,90],e:[68,40],ha:[66,42]}},
@@ -449,7 +416,6 @@ const FIG={
 };
 const BONES=[["n","hp"],["hp","k"],["k","a"],["a","f"],["n","e"],["e","ha"],["hp","k2"],["k2","a2"],["a2","f2"],["n","e2"],["e2","ha2"]];
 
-/* —— Persistència + temps (verbatim) —— */
 const KEY="hp_companion_v1";
 function localISO(d){d=d?new Date(d):new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 const todayISO=()=>localISO();
@@ -469,7 +435,7 @@ function pickSaved(a,b){
  if(au!==bu)return au>bu?a:b;
  const ar=Number(a.rev)||0,br=Number(b.rev)||0;
  if(ar!==br)return ar>br?a:b;
- return b; /* localStorage és síncron: si hi ha empat, normalment és la còpia més recent */
+ return b;
 }
 async function initStore(){
  idb=await idbOpen();
@@ -518,8 +484,6 @@ function applyPrefs(){document.body.classList.toggle("perf",!!(D.set&&D.set.perf
 window.addEventListener("pagehide",save);
 window.addEventListener("beforeunload",save);
 
-/* —— Motor de progressió + deload + coach (verbatim) —— */
-/* ================= Motor de progressió ================= */
 function lastEntries(exId,n){n=n||3;const out=[];for(let i=D.history.length-1;i>=0&&out.length<n;i--){const h=D.history[i];if(h.entries&&h.entries[exId])out.push({date:h.dateISO,sets:h.entries[exId].sets,up:(h.levelUps||[]).indexOf(exId)>=0})}return out}
 const bestScore=sets=>sets.reduce((m,s)=>Math.max(m,(s.k||0)*1000+(s.r||0)),0);
 const allTop=(ex,sets)=>sets.length>=1&&sets.every(s=>s.r>=ex.rep[1]);
@@ -578,7 +542,6 @@ function coachMsgs(){
   else if(wk>=1&&t===0)m.push({c:"hold",h:wk+" sessions els últims 7 dies (objectiu ~5–6). Tot el que has de fer avui ja està decidit a sota."});
  }
  if(!m.length)m.push({c:"sage",h:"Tot en ordre. Objectiu: V-taper i recomposició. El pla pensa — tu executa."});
- // Recordatori de backup: cada 30 dies o cada 25 sessions
  if(storageOK&&D.history.length){
   const lastBk=D.lastBackup||D.startDate;
   const dsince=daysBetween(lastBk,today);
@@ -590,8 +553,6 @@ function coachMsgs(){
  return m.slice(0,2);
 }
 
-/* —— Àudio sintetitzat (verbatim, funciona a iOS) —— */
-/* ================= Àudio + hàptics ================= */
 let AC=null;
 function ensureAudio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();if(navigator.audioSession){try{navigator.audioSession.type="transient"}catch(e){}}}catch(e){}}
 function tone(f0,f1,dur,vol,when,type){try{if(!AC)return;if(D.set&&!D.set.sound)return;const t0=AC.currentTime+(when||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f0,t0);if(f1&&f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t0+dur);o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.start(t0);o.stop(t0+dur+.02)}catch(e){}}
@@ -604,7 +565,6 @@ const sndUp=()=>tone(500,1000,.22,.55,0,"triangle");
 const sndDone=()=>{tone(659,659,.16,.45,0);tone(988,988,.3,.45,.18)};
 const sndLevel=()=>{tone(523,523,.12,.45,0,"triangle");tone(659,659,.12,.45,.13,"triangle");tone(784,784,.24,.5,.26,"triangle")};
 
-/* —— Icones SVG + figura estàtica + anell (verbatim) —— */
 const ICO={
  today:'<path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.8V20h13V9.8"/>',
  chart:'<path d="M5 20v-7"/><path d="M12 20V6"/><path d="M19 20v-4"/>',
@@ -622,8 +582,6 @@ function figStatic(ex,size){
 }
 function bestEver(exId){let bk=0,br=0;D.history.forEach(h=>{const e=h.entries&&h.entries[exId];if(e)e.sets.forEach(s=>{const k=s.k||0;if(k>bk){bk=k;br=s.r||0}else if(k===bk&&(s.r||0)>br)br=s.r||0})});return{bk:bk,br:br}}
 
-/* —— Matemàtica de tempo + onada (verbatim) —— */
-/* ================= Tempo compartit (NO TOCAR la matemàtica) ================= */
 function parseTempo(t){t=(t||"").toLowerCase();if(t.indexOf("isom")>=0)return{iso:1};const m=t.match(/(\d+)\s*-\s*(\d+)\s*-\s*(\d+)/);if(m)return{e:+m[1],p:+m[2],c:+m[3]};if(t.indexOf("ecc")>=0)return{e:3,p:0,c:1};if(t==="lent")return{e:2,p:0,c:2};return{e:2,p:0,c:1}}
 const sm=t=>t*t*(3-2*t);
 function phaseAt(tp,tl){
@@ -634,7 +592,6 @@ function phaseAt(tp,tl){
 }
 const cycLen=tp=>tp.iso?1:tp.e+tp.p+Math.max(tp.c,.8);
 
-/* ================= Pacer (onada) + figura (NO TOCAR) ================= */
 let P=null,Fraf=0,figT0=0;
 const WV={W:340,H:160,T:34,B:124,CW:230,BX:170};
 function waveYAt(tp,tl){if(tp.iso)return (WV.T+WV.B)/2;const ph=phaseAt(tp,tl);return WV.T+(WV.B-WV.T)*ph.t}
@@ -649,7 +606,6 @@ function wavePath(tp){
  return d;
 }
 
-/* —— Dibuix de figura animada (verbatim) —— */
 function figDraw(pose){
  BONES.forEach(function(b,i){
   const el=document.getElementById("fb"+i);if(!el)return;
@@ -662,7 +618,6 @@ function figDraw(pose){
 }
 function lerpPose(A,B,t){const o={};for(const k in A){if(B[k])o[k]=[A[k][0]+(B[k][0]-A[k][0])*t,A[k][1]+(B[k][1]-A[k][1])*t];else o[k]=A[k]}return o}
 
-/* —— Avaluació d'exercici + aplicació de kg (verbatim) —— */
 function loggedSets(d){return d.sets.filter(s=>s.r>0&&s.rir!=null).map(s=>({r:s.r,k:s.k,rir:s.rir}))}
 function evalExercise(ex,sets){
  if(ex.prog==="none"||!sets.length)return null;
@@ -684,7 +639,6 @@ function applyKg(v){
  d.touched=d.touched||v>0;
 }
 
-/* —— Discos + escape HTML (verbatim) —— */
 function plates(total){
  if(!(total>20.01))return{bar:true,out:[],rem:0};
  let rem=(total-20)/2;const out=[];
@@ -692,18 +646,7 @@ function plates(total){
  return{bar:false,out:out,rem:rem};
 }
 
-/* ================= Vistes ================= */
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-/* ===================================================================
-   NUEVO SISTEMA NERVIOSO (reescrito desde cero sobre el mismo cerebro).
-   - Render quirúrgico: la pantalla de entreno se monta UNA vez y se
-     parchea por referencias cacheadas (cero innerHTML por interacción).
-   - Háptica iOS real (best-effort) vía el truco del <input switch>.
-   - Transición de elemento compartido (la figura morfa home -> focus).
-   - Bucle de animación con refs cacheadas (sin getElementById por frame).
-   - Accesibilidad: aria-live en timer/pacer, roles, focus-visible, 44pt.
-   =================================================================== */
 
 const $=s=>document.querySelector(s);
 let UI={screen:"home",workout:null,summary:null,over:null,toastTm:null,exitArm:0};
@@ -712,7 +655,6 @@ const ITEM_H=56;
 const RING_RC=2*Math.PI*112;
 const reduceMotion=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* —— iconos añadidos (sustituyen los emoji) —— */
 Object.assign(ICO,{
  slate:'<rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M3.4 9l2.2-4 3.4 1.3L6.6 10z"/><path d="M9 6.3l3.4 1.3L9.8 11"/><path d="M14.6 7.6l3.4 1.3L15.4 12"/>',
  weight:'<path d="M6.5 9v6M17.5 9v6M4 10.5v3M20 10.5v3M6.8 12h10.4"/>',
@@ -724,11 +666,12 @@ Object.assign(ICO,{
  chevL:'<path d="M15 5l-7 7 7 7"/>',
  chevR:'<path d="M9 5l7 7-7 7"/>',
  plus:'<path d="M12 5v14M5 12h14"/>',
- list:'<path d="M4 7h16M4 12h16M4 17h16"/>'
+ list:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+ close:'<path d="M6 6l12 12M18 6L6 18"/>',
+ cal:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4M15 3v4"/>'
 });
 function figStaticNamed(ex,size){return figStatic(ex,size).replace('<svg ','<svg class="hero-fig" ')}
 
-/* —— Háptica (NUEVO; sustituye vib()). iOS: Taptic best-effort. —— */
 let _hLabel=null;
 function hapticInit(){
  try{
@@ -745,11 +688,10 @@ function haptic(kind){
    const P2={sel:6,tick:9,soft:18,ok:[55,35,55,35,150],warn:[26,44,26],heavy:[210,100,210]};
    navigator.vibrate(P2[kind]!=null?P2[kind]:12);
   }
-  if(_hLabel)_hLabel.click(); /* iOS: solo dispara dentro de un gesto del usuario */
+  if(_hLabel)_hLabel.click();
  }catch(e){}
 }
 
-/* —— Wake lock + reconciliación de descanso al volver a primer plano —— */
 let WL=null;
 async function wakeOn(){try{if("wakeLock"in navigator)WL=await navigator.wakeLock.request("screen")}catch(e){}}
 function wakeOff(){try{if(WL){WL.release();WL=null}}catch(e){}}
@@ -757,7 +699,6 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 
 function setMode(){try{let m="";if(UI.workout){const sk=UI.workout.sk;m=sk.indexOf("PULL")===0?"pull":sk.indexOf("LEGS")===0?"legs":"push"}if(m)document.body.setAttribute("data-mode",m);else document.body.removeAttribute("data-mode")}catch(e){}}
 
-/* —— cursores + conteos —— */
 const curS=()=>SESSIONS[UI.workout.sk];
 const curEx=()=>curS().ex[UI.workout.ei];
 const curDraft=()=>UI.workout.draft[curEx().id];
@@ -767,14 +708,11 @@ function doneEx(){return curS().ex.filter(e=>UI.workout.draft[e.id].sets.some(x=
 function nextSeq(ei,si){const d=UI.workout.draft[curS().ex[ei].id];if(si+1<d.sets.length)return{ei,si:si+1};if(ei+1<curS().ex.length)return{ei:ei+1,si:0};return null}
 function nextUnlogged(ei,si){let p=nextSeq(ei,si);while(p){const s=UI.workout.draft[curS().ex[p.ei].id].sets[p.si];if(s.rir==null)return p;p=nextSeq(p.ei,p.si)}return null}
 
-/* —— toast —— */
 function showToast(ic,msg,ms){const host=document.getElementById("toast-host");if(!host)return;host.innerHTML='<div class="toast" role="status">'+(ic?'<span class="ti">'+ic+'</span>':'')+'<span>'+esc(msg)+'</span></div>';if(UI.toastTm)clearTimeout(UI.toastTm);UI.toastTm=setTimeout(()=>{host.innerHTML=""},ms||3400)}
 
-/* —— swap de pantalla con transición (solo home/summary; focus se parchea) —— */
 function swap(html,after){const el=document.getElementById("app");const run=()=>{el.innerHTML=html;if(after)after()};if(document.startViewTransition&&!reduceMotion()){document.startViewTransition(run)}else run()}
 function render(){if(UI.workout||UI.summary)return;buildHome()}
 
-/* ===================== HOME ===================== */
 function tabBar(active){const T=[["avui","today","Avui"],["progres","chart","Progrés"],["pla","book","Pla"],["jo","gear","Jo"]];return '<nav class="tabs" aria-label="Navegació principal">'+T.map(t=>'<button class="tap'+(t[0]===active?' on':'')+'" '+(t[0]===active?'aria-current="page"':'data-a="tab" data-t="'+t[0]+'"')+' aria-label="'+t[2]+'">'+icon(t[1],21)+'<span>'+t[2]+'</span></button>').join("")+'</nav>'}
 
 function buildHome(){
@@ -800,7 +738,6 @@ function buildHome(){
  swap(h);
 }
 
-/* ===================== FOCUS (montaje único + parcheo) ===================== */
 function figInner(){const ex=curEx(),Fg=FIG[ex.fig]||FIG.squat,A=Fg.A;let h='<g>';(Fg.p||[]).forEach(p=>h+='<line class="prop" x1="'+p[0]+'" y1="'+p[1]+'" x2="'+p[2]+'" y2="'+p[3]+'"/>');BONES.forEach((b,i)=>{const a=A[b[0]],c=A[b[1]],has=a&&c;h+='<line class="bone" id="fb'+i+'" opacity="'+(has?1:0)+'"'+(has?' x1="'+a[0]+'" y1="'+a[1]+'" x2="'+c[0]+'" y2="'+c[1]+'"':'')+'/>'});h+='<circle class="bhead" id="fhd" r="5.5" cx="'+A.h[0]+'" cy="'+A.h[1]+'"/></g>';return h}
 function recacheFig(){F.figBones=[];for(let i=0;i<BONES.length;i++)F.figBones[i]=document.getElementById("fb"+i);F.figHead=document.getElementById("fhd")}
 function figDrawCached(pose){for(let i=0;i<BONES.length;i++){const el=F.figBones[i];if(!el)continue;const a=pose[BONES[i][0]],c=pose[BONES[i][1]];if(!a||!c){el.setAttribute("opacity","0");continue}el.setAttribute("opacity","1");el.setAttribute("x1",a[0]);el.setAttribute("y1",a[1]);el.setAttribute("x2",c[0]);el.setAttribute("y2",c[1])}if(F.figHead&&pose.h){F.figHead.setAttribute("cx",pose.h[0]);F.figHead.setAttribute("cy",pose.h[1])}}
@@ -880,7 +817,6 @@ function syncFocus(){
  F._exId=ex.id;setMode();
 }
 
-/* —— rodes —— */
 function wheelVals(kind,ex){if(kind==="kg"){const a=[];for(let v=0;v<=120;v+=.5)a.push(v);return a}if(ex.time){const a=[];for(let v=0;v<=120;v+=5)a.push(v);return a}const a=[];for(let v=0;v<=30;v++)a.push(v);return a}
 function wheelIdx(kind,ex,val){const vals=wheelVals(kind,ex);let b=0,bd=1e9;vals.forEach((v,i)=>{const dd=Math.abs(v-val);if(dd<bd){bd=dd;b=i}});return b}
 function wheelItems(kind,ex){const vals=wheelVals(kind,ex);let h='<div class="wpad" aria-hidden="true"></div>';vals.forEach((v,i)=>h+='<div class="witem" aria-hidden="true" data-wi="'+i+'">'+(kind==="kg"?(v%1?v.toFixed(1):v):v)+'</div>');return h+'<div class="wpad" aria-hidden="true"></div>'}
@@ -897,10 +833,26 @@ function setWheel(kind,val){F.silentUntil=Date.now()+600;const el=F["wheel"+kind
 function nudge(kind,delta){const w=UI.workout;if(!w)return;const s=curDraft().sets[w.si];if(kind==="kg"){let v=Math.max(0,Math.min(120,(s.k||0)+delta));v=Math.round(v*2)/2;applyKg(v);setWheel("kg",v)}else{let v=Math.max(0,Math.min(ex_time_max(),(s.r||0)+delta));s.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;setWheel("reps",v)}updateWheelA11y(kind,kind==="kg"?(s.k||0):(s.r||0),curEx());haptic("sel");saveDraft()}
 function ex_time_max(){return curEx().time?120:30}
 
-/* —— animación: pacer + figura (refs cacheadas) —— */
 function kickFrame(){figT0=performance.now();if(reduceMotion()&&!P){const Fg=FIG[curEx().fig]||FIG.squat;figDrawCached(Fg.A);return}if(!Fraf)Fraf=requestAnimationFrame(frame)}
 function pacerStart(){ensureAudio();P={t0:performance.now(),reps:0,lastTick:-1,lastPhase:""};if(F.pbtn)F.pbtn.innerHTML=icon("pause",15)+" Atura el ritme";if(F.wavebox)F.wavebox.classList.add("run");haptic("tick");kickFrame()}
-function pacerStop(commit){if(P&&commit&&P.reps>0&&UI.workout){const d=curDraft(),s=d.sets[UI.workout.si];s.r=P.reps;d.touched=true;setWheel("reps",P.reps);if(F.wcount)F.wcount.textContent=P.reps;saveDraft()}P=null;if(F.pbtn)F.pbtn.innerHTML=icon("play",15)+" Marca'm el ritme";if(F.wavebox)F.wavebox.classList.remove("run","glow");if(F.wph)F.wph.textContent="▶ marca el ritme"}
+function pacerStop(commit){
+  if(P&&commit&&P.reps>0&&UI.workout){
+    const d=curDraft(),s=d.sets[UI.workout.si];
+    s.r=P.reps;d.touched=true;setWheel("reps",P.reps);
+    if(F.wcount)F.wcount.textContent=P.reps;saveDraft();
+  }
+  P=null;
+  if(F.pbtn)F.pbtn.innerHTML=icon("play",15)+" Marca'm el ritme";
+  if(F.wavebox)F.wavebox.classList.remove("run","glow");
+  if(F.wph)F.wph.textContent="▶ marca el ritme";
+  
+  // FIX: Resetear la posición de la onada i la pilota
+  if(F.wgrp)F.wgrp.setAttribute("transform","translate(0,0)");
+  if(F.wball){
+    F.wball.setAttribute("cx", WV.BX);
+    F.wball.setAttribute("cy", ((WV.T+WV.B)/2).toFixed(1));
+  }
+}
 function frame(now){
  if(!UI.workout||!F.scr||!document.body.contains(F.scr)){Fraf=0;return}
  const w=UI.workout,ex=curEx(),tp=parseTempo(ex.tempo),cyc=cycLen(tp),Fg=FIG[ex.fig]||FIG.squat;
@@ -916,7 +868,6 @@ function frame(now){
  Fraf=requestAnimationFrame(frame);
 }
 
-/* —— acciones de set —— */
 function flashSide(){if(F.sidepill){F.sidepill.classList.add("flash");setTimeout(()=>F.sidepill&&F.sidepill.classList.remove("flash"),300)}}
 function commitSet(rir){
  const w=UI.workout;if(!w)return;const ex=curEx(),d=curDraft(),s=d.sets[w.si];
@@ -934,7 +885,6 @@ function gotoPos(p){const w=UI.workout;pacerStop(false);w.ei=p.ei;w.si=p.si;w.si
 function navStep(dir){const w=UI.workout;pacerStop(false);if(dir>0){const n=nextSeq(w.ei,w.si);if(n)gotoPos(n);else gotoFinish()}else{if(w.si>0)gotoPos({ei:w.ei,si:w.si-1});else if(w.ei>0){const pe=w.ei-1,pd=w.draft[curS().ex[pe].id];gotoPos({ei:pe,si:pd.sets.length-1})}}}
 function gotoFinish(){finishWorkout()}
 
-/* ===================== DESCANS (overlay) ===================== */
 function startRest(){
  const w=UI.workout,ex=curEx(),s=curDraft().sets[w.si],be=bestEver(ex.id);
  const pr=((s.k||0)>be.bk||((s.k||0)===be.bk&&(s.r||0)>be.br))&&(be.bk>0||be.br>0)&&s.r>0;
@@ -979,7 +929,6 @@ function restAdvance(){
 function restUndo(){const w=UI.workout;if(!w||!w.rest)return;clearInterval(w.restIv);const f=w.rest.from;w.rest=null;w.phase="set";w.ei=f.ei;w.si=f.si;w.sideIdx=0;const d=w.draft[curS().ex[f.ei].id],s=d.sets[f.si];s.rir=null;delete s.rirL;const ex=curS().ex[f.ei];if(w.verdicts[ex.id])delete w.verdicts[ex.id];const ov=document.getElementById("restwrap");if(ov)ov.remove();saveDraft();syncFocus();haptic("sel")}
 function restPlus30(){const w=UI.workout;if(!w||!w.rest)return;w.rest.until+=30000;w.rest.total+=30;w.rest.fin=false;restTick();haptic("sel")}
 
-/* ===================== FINAL + SUMARI ===================== */
 function finishWorkout(force){
  const w=UI.workout;if(!w)return;const S=SESSIONS[w.sk],entries={},ups=[],dec={},missing=[];
  const gBefore=gapDays();
@@ -1016,7 +965,6 @@ function buildSummary(){
  swap(h);
 }
 
-/* ===================== overlays / sheets (arrastrar para cerrar) ===================== */
 function openSheet(html){const host=document.getElementById("overlay-host");UI.lastFocus=document.activeElement;host.innerHTML='<div class="scrim" data-a="closeover"></div><div class="sheet2" role="dialog" aria-modal="true" tabindex="-1">'+html+'</div>';const sh=host.querySelector(".sheet2");const app=document.getElementById("app");if(app)app.setAttribute("aria-hidden","true");requestAnimationFrame(()=>{host.classList.add("show");sh.focus({preventScroll:true})});attachSheetDrag(sh)}
 function closeOver(){const host=document.getElementById("overlay-host");host.classList.remove("show");const app=document.getElementById("app");if(app)app.removeAttribute("aria-hidden");setTimeout(()=>{host.innerHTML="";try{if(UI.lastFocus&&UI.lastFocus.focus)UI.lastFocus.focus({preventScroll:true})}catch(e){}},260);UI.over=null;UI.editLast=null}
 function trapSheetFocus(e){const sh=document.querySelector("#overlay-host .sheet2");if(!sh)return;const f=Array.from(sh.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(x=>!x.disabled&&x.offsetParent!==null);if(!f.length){e.preventDefault();sh.focus();return}const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
@@ -1027,7 +975,6 @@ function openPlates(){const ex=curEx(),s=curDraft().sets[UI.workout.si],total=s.
 function openSettings(replace){const set=D.set,sw=on=>'<span class="sw'+(on?" on":"")+'"><i></i></span>';let h='<div class="sheetlbl">'+icon("gear",12)+' Ajustos</div>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.sound?"true":"false")+'" data-a="togglesound" style="width:100%;text-align:left"><span>So del marcador</span>'+sw(set.sound)+'</button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.autopacer?"true":"false")+'" data-a="toggleauto" style="width:100%;text-align:left"><span>Iniciar ritme automàtic</span>'+sw(set.autopacer)+'</button>';h+='<button class="srow tap" data-a="cycleprep" style="width:100%;text-align:left"><span>Compte enrere d\'inici</span><span class="st">'+(set.prep||6)+' s</span></button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.perf?"true":"false")+'" data-a="toggleperf" style="width:100%;text-align:left"><span>Mode rendiment</span>'+sw(set.perf)+'</button>';h+='<button class="srow tap" data-a="testsound" style="width:100%;text-align:left"><span>Provar so</span><span class="st">'+icon("play",15)+'</span></button>';h+='<button class="srow tap" data-a="backup" style="width:100%;text-align:left"><span>Exportar còpia (.json)</span><span class="st">'+icon("undo",15)+'</span></button>';h+='<button class="srow tap" data-a="backupcsv" style="width:100%;text-align:left"><span>Exportar historial (.csv)</span><span class="st">CSV</span></button>';h+='<div class="note"><b>v10.1 Final:</b> HTML autònom, cache offline si s\'inclou el sw.js del paquet, data local amb conflictes resolts, importació validada, CSV, focus/teclat en panells i mode rendiment. <br><br><b>Sobre la vibració:</b> a iOS el web només pot donar resposta tàctil limitada. Per a hàptica rica i alarmes amb pantalla bloquejada cal versió nativa.</div>';if(replace){const sh=document.querySelector("#overlay-host .sheet2");if(sh){sh.innerHTML=h;return}}openSheet(h)}
 function openConfirmFinish(names){let h='<div class="sheetlbl">'+icon("list",12)+' Acabar sense desar-ho tot?</div><div class="note" style="margin-top:14px">Aquests exercicis no tenen cap sèrie registrada i no es desaran:</div><div style="margin-top:8px">'+names.map(n=>'<div class="plrow"><span>'+esc(n)+'</span><span class="mut">sense dades</span></div>').join("")+'</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="cancelfinish">Tornar</button><button class="fnav tap" data-a="forcefinish" style="background:var(--accso);color:var(--acc2)">Desar igualment →</button></div>';openSheet(h)}
 
-/* —— sortir / export / arrancar —— */
 function exitWorkout(){UI.exitArm=0;const w=UI.workout;pacerStop(false);if(w&&w.restIv)clearInterval(w.restIv);const ov=document.getElementById("restwrap");if(ov)ov.remove();if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}wakeOff();saveDraft();UI.workout=null;F={};buildHome()}
 function downloadBlob(name,type,text){const blob=new Blob([text],{type});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);a.remove()}
 function exportData(){try{downloadBlob("hollywood-protocol-backup-"+todayISO()+".json","application/json",JSON.stringify(D,null,1));D.lastBackup=todayISO();save()}catch(e){}}
@@ -1052,10 +999,9 @@ function startWorkout(){
  wakeOn();saveDraft();buildFocus();
 }
 
-/* —— swipe ligero para navegar entre ejercicios —— */
 function attachSwipe(){const el=document.querySelector("#focusScreen .fbody");if(!el)return;let x0=null,y0=null;el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});el.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;if(Math.abs(dx)>72&&Math.abs(dx)>Math.abs(dy)*1.6){if(dx<0)navStep(1);else navStep(-1);haptic("sel")}x0=null},{passive:true})}
 
-/* ===================== eventos ===================== */
+// ===================== EVENTS UNIFICATS =====================
 document.addEventListener("click",e=>{
  const t=e.target.closest("[data-a]");if(!t)return;const a=t.dataset.a;ensureAudio();
  switch(a){
@@ -1065,7 +1011,7 @@ document.addEventListener("click",e=>{
   case "reentry":startReentry();break;
   case "backup":exportData();showToast(icon("check",16),"Còpia desada · "+todayISO());break;
   case "settings":openSettings();break;
-  case "tabsoon":showToast(icon("list",16),"Aquesta pestanya arriba a la versió completa. El prototip demostra el bucle d'entreno.");break;
+  case "tabsoon":showToast(icon("list",16),"Aquesta pestanya arriba a la versió completa.");break;
   case "exit":if(UI.exitArm){exitWorkout()}else{UI.exitArm=1;syncFocus();setTimeout(()=>{if(UI.exitArm){UI.exitArm=0;if(UI.workout&&F.scr)syncFocus()}},3000)}break;
   case "list":openList();break;
   case "closeover":closeOver();break;
@@ -1095,13 +1041,34 @@ document.addEventListener("click",e=>{
   case "backupcsv":exportCSV();showToast(icon("check",16),"CSV desat · "+todayISO());break;
   case "cycleprep":{const pp=D.set.prep||6;D.set.prep=pp>=7?5:pp+1;save();haptic("sel");openSettings(true)}break;
   case "testsound":ensureAudio();sndPrep();setTimeout(sndDown,450);setTimeout(sndPause,900);setTimeout(sndUp,1350);setTimeout(sndDone,1850);haptic("soft");break;
+  
+  // --- Events de les pantalles noves ---
+  case "tab":goTab(t.dataset.t);break;
+  case "obnext":obNext();break;
+  case "obskip":finishOnboarding();break;
+  case "josound":D.set.sound=D.set.sound?0:1;save();haptic("sel");buildJo();break;
+  case "joauto":D.set.autopacer=D.set.autopacer?0:1;save();haptic("sel");buildJo();break;
+  case "joprep":{const pp=D.set.prep||6;D.set.prep=pp>=7?5:pp+1;save();haptic("sel");buildJo()}break;
+  case "joperf":D.set.perf=D.set.perf?0:1;applyPrefs();save();haptic("sel");buildJo();break;
+  case "jotest":ensureAudio();sndPrep();setTimeout(sndDown,450);setTimeout(sndPause,900);setTimeout(sndUp,1350);setTimeout(sndDone,1850);haptic("soft");break;
+  case "joexport":exportData();showToast(icon("check",16),"Còpia desada · "+todayISO());break;
+  case "joexportcsv":exportCSV();showToast(icon("check",16),"CSV desat · "+todayISO());break;
+  case "joimport":importData();break;
+  case "joundo":{const last=D.history[D.history.length-1];if(!last){showToast(icon("list",16),"No hi ha cap sessió per desfer");break}openSheet(`<div class="sheetlbl" style="color:var(--warn)">${icon("undo",12)} Desfer última sessió?</div><div class="note" style="margin-top:14px">Es traurà ${esc((SESSIONS[last.sessionKey]||{name:last.sessionKey}).name)} del ${fmtD(last.dateISO)}, es revertiran les pujades de nivell d'aquesta sessió i el cicle tornarà un dia enrere.</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="closeover">Cancel·lar</button><button class="fnav tap" data-a="joundook" style="background:rgba(255,178,89,.16);color:var(--warn)">Desfer</button></div>`)}break;
+  case "joundook":undoLastSession();break;
+  case "joreset":openSheet(`<div class="sheetlbl" style="color:var(--bad)">${icon("close",12)} Esborrar-ho tot?</div><div class="note" style="margin-top:14px">S'esborraran historial, nivells i ajustos. No es pot desfer. Exporta una còpia abans si vols conservar-ho.</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="closeover">Cancel·lar</button><button class="fnav tap" data-a="joresetok" style="background:rgba(255,100,100,.16);color:var(--bad)">Esborrar tot</button></div>`);break;
+  case "joresetok":D=fresh();save();closeOver();obIdx=0;haptic("heavy");buildHome();break;
+  case "jodeload":startDeload();showToast(icon("check",16),"Deload activat · 8 dies");buildJo();break;
+  case "joreentry":startReentry();showToast(icon("check",16),"Readaptació activada · 8 dies");buildJo();break;
+  case "jocyclefwd":D.cycleIndex=(D.cycleIndex+1)%8;save();haptic("sel");buildJo();break;
+  case "jocycleback":D.cycleIndex=(D.cycleIndex+7)%8;save();haptic("sel");buildJo();break;
+  case "joeditlast":editLastSession(t.dataset.from||"jo");break;
+  case "editpastsession":editSession(+t.dataset.idx, t.dataset.from || "progres"); break;
+  case "elrir":elSetRir(t.dataset.x,+t.dataset.s,+t.dataset.r);break;
+  case "elsave":applyEditLast();break;
  }
 });
 
-/* ===================== PWA + arranque ===================== */
-/* Manifest auto-contingut: s'injecta en temps d'execució amb una Blob URL,
-   així no cal cap fitxer extern (zero 404 a GitHub Pages) i segueix sent
-   instal·lable a Chromium. iOS fa servir les meta apple-* d'aquí dalt. */
 function injectManifest(){
  try{
   var base=new URL(".",location.href).href;
@@ -1118,23 +1085,14 @@ function setupPWA(){
    const swUrl=new URL("./sw.js",location.href);
    fetch(swUrl,{method:"HEAD",cache:"no-store"}).then(r=>{if(!r.ok)return;navigator.serviceWorker.register(swUrl,{scope:"./"}).then(function(reg){
     if(reg&&reg.waiting){reg.waiting.postMessage({type:"SKIP_WAITING"})}
-   }).catch(function(){/* l'HTML continua funcionant sense SW */});}).catch(function(){});
+   }).catch(function(){});}).catch(function(){});
   }
  }catch(e){}
 }
 function boot(){D=sanitizeData(D);D.set=Object.assign(fresh().set,D.set||{});applyPrefs();hapticInit();injectManifest();setupPWA();if(!D.onboarded)buildOnboarding();else buildHome()}
-/* arranque movido al final (tras screens2) */
-
-/* ===================================================================
-   PANTALLAS ADICIONALES (mismo patrón, mismo núcleo verbatim).
-   Progrés · Pla · Jo · Onboarding · Importación de datos.
-   No críticas para rendimiento -> se construyen con swap() completo.
-   =================================================================== */
-Object.assign(ICO,{close:'<path d="M6 6l12 12M18 6L6 18"/>',cal:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4M15 3v4"/>'});
 
 function goTab(name){if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}if(name==="avui")return buildHome();if(name==="progres")return buildProgress();if(name==="pla")return buildPla();if(name==="jo")return buildJo()}
 
-/* ===================== PROGRÉS ===================== */
 function buildProgress(){
  UI.workout=null;UI.summary=null;document.body.removeAttribute("data-mode");
  const H=D.history;
@@ -1152,7 +1110,16 @@ function buildProgress(){
  const lvHtml=lv.length?`<div class="scrtitle">${icon("flame",12)} Nivells per exercici</div><div class="chartcard" style="padding-top:4px;padding-bottom:4px">${lv.map(p=>{const e=EX(p[0]);return e?`<div class="lvrow"><span class="n">${esc(e.name.split(" (")[0])}</span><span class="c">${icon("flame",13)} ×${p[1]}</span></div>`:""}).join("")}</div>`:"";
  const st=stalledList();
  const stHtml=st.length?`<div class="scrtitle">Atenció · estancats</div><div class="chartcard"><div class="tagrow">${st.map(e=>`<span class="tag warn">${esc(e.name.split(" ·")[0].split(" (")[0])}</span>`).join("")}</div><div class="note">Tenen indicació especial al pròxim entreno (micro-salt forçat, sèrie extra o treure llast).</div></div>`:"";
- const recent=H.slice(-8).reverse().map((s,ri)=>{const nm=(SESSIONS[s.sessionKey]||{name:s.sessionKey}).name;const ups=(s.levelUps||[]).length;const inner=`<span class="d">${fmtD(s.dateISO)}</span><span class="sn">${esc(nm)}${s.deload?` · <span class="mono" style="color:var(--warn)">deload</span>`:""}</span>${ups?`<span class="up">${icon("flame",12)} ${ups}</span>`:`<span class="sx">${s.dur||"·"} min</span>`}`;return ri===0?`<button class="sess tap" data-a="joeditlast" data-from="progres" aria-label="Corregir l'última sessió">${inner}<span class="sx" style="margin-left:8px;color:var(--acc2)">${icon("weight",12)} editar</span></button>`:`<div class="sess">${inner}</div>`}).join("");
+ 
+ // FIX: Botons per editar qualsevol sessió passada
+ const recent=H.slice(-20).reverse().map((s,ri)=>{
+  const realIdx = H.length - 1 - ri;
+  const nm=(SESSIONS[s.sessionKey]||{name:s.sessionKey}).name;
+  const ups=(s.levelUps||[]).length;
+  const inner=`<span class="d">${fmtD(s.dateISO)}</span><span class="sn">${esc(nm)}${s.deload?` · <span class="mono" style="color:var(--warn)">deload</span>`:""}</span>${ups?`<span class="up">${icon("flame",12)} ${ups}</span>`:`<span class="sx">${s.dur||"·"} min</span>`}`;
+  return `<button class="sess tap" data-a="editpastsession" data-idx="${realIdx}" data-from="progres" aria-label="Corregir sessió">${inner}<span class="sx" style="margin-left:8px;color:var(--acc2)">${icon("weight",12)} editar</span></button>`;
+ }).join("");
+ 
  swap(`<div class="wrap">
   <header class="top"><div class="brand"><div class="slate">${icon("chart",13)} Progrés</div><h1>El teu rastre</h1><div class="sub">${H.length} sessions registrades</div></div></header>
   <div class="stats"><div class="stat"><b>${H.length}</b><span>Sessions</span></div><div class="stat"><b>${days}</b><span>Dies entrenats</span></div><div class="stat"><b>${totLv}</b><span>Pujades nivell</span></div></div>
@@ -1163,7 +1130,6 @@ function buildProgress(){
  </div>`+tabBar("progres"));
 }
 
-/* ===================== PLA ===================== */
 function buildPla(){
  UI.workout=null;UI.summary=null;document.body.removeAttribute("data-mode");
  const order=["PUSH_A","PULL_A","LEGS_A","PUSH_B","PULL_B","LEGS_B"];
@@ -1178,7 +1144,6 @@ function buildPla(){
  </div>`+tabBar("pla"));
 }
 
-/* ===================== JO ===================== */
 function buildJo(){
  UI.workout=null;UI.summary=null;document.body.removeAttribute("data-mode");
  const set=D.set,sw=on=>`<span class="sw${on?" on":""}"><i></i></span>`;
@@ -1219,24 +1184,23 @@ function undoLastSession(){
  D.draft=null;save();closeOver();showToast(icon("undo",16),"Última sessió desfeta");buildJo();
 }
 
-/* ===================== Corregir l'última sessió ===================== */
-/* Permet rectificar pes / reps / RIR de l'última sessió ja desada (p. ex. un
-   pes mal anotat). En desar, es recalculen els veredictes i es reconcilien les
-   pujades de nivell d'aquesta sessió (respectant deload i sessions suaus). */
-function editLastSession(from){
- if(!D.history.length){showToast(icon("list",16),"No hi ha cap sessió per corregir");return}
- const idx=D.history.length-1,h=D.history[idx],S=SESSIONS[h.sessionKey];
+// ===================== EDICIÓ DE SESSSIONS =====================
+function editSession(idx, from){
+ if(idx<0 || idx>=D.history.length){showToast(icon("close",16),"Sessió no vàlida");return}
+ const h=D.history[idx],S=SESSIONS[h.sessionKey];
  if(!S){showToast(icon("close",16),"Sessió desconeguda");return}
  const sets={};
  S.ex.forEach(ex=>{const e=h.entries&&h.entries[ex.id];if(e&&Array.isArray(e.sets)&&e.sets.length)sets[ex.id]=e.sets.map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir}))});
  if(!Object.keys(sets).length){showToast(icon("close",16),"Aquesta sessió no té sèries registrades");return}
- UI.editLast={idx,sk:h.sessionKey,from:from||"jo",sets};
+ UI.editLast={idx,sk:h.sessionKey,from:from||"progres",sets};
  openSheet(editLastHTML());
 }
+function editLastSession(from){ editSession(D.history.length - 1, from); }
+
 function editLastHTML(){
  const h=D.history[UI.editLast.idx],S=SESSIONS[UI.editLast.sk];
- let html='<div class="sheetlbl">'+icon("weight",12)+" Corregir l'última sessió</div>";
- html+='<div class="note" style="margin-top:10px"><b>'+esc(S.name)+' · '+fmtD(h.dateISO)+'</b><br>Ajusta el pes, les reps o el RIR de qualsevol sèrie si vas registrar alguna cosa malament. Els nivells i la progressió es recalculen sols en desar.</div>';
+ let html='<div class="sheetlbl">'+icon("weight",12)+" Corregir sessió del "+fmtD(h.dateISO)+'</div>';
+ html+='<div class="note" style="margin-top:10px"><b>'+esc(S.name)+' · '+fmtD(h.dateISO)+'</b><br>Canvia els valors si vas anotar alguna cosa malament. Si vols avançar la progressió (ex: passar de flexions inclinades a declinades amb xaleco), simplement posa les sèries i el pes/chaleco que vas fer realment i marca el RIR. L\'app recalcularà el teu nivell i la propera sessió et demanarà progressar des d\'aquell punt.</div>';
  S.ex.forEach(ex=>{
   const work=UI.editLast.sets[ex.id];if(!work)return;
   const unit=ex.time?"s":"reps",nm=esc(ex.name.split(" (")[0]);
@@ -1273,7 +1237,6 @@ function applyEditLast(){
  if(from==="progres")buildProgress();else if(from==="jo")buildJo();else if(!UI.workout&&!UI.summary)buildHome();
 }
 
-/* ===================== Importar dades ===================== */
 function importData(){
  const inp=document.createElement("input");inp.type="file";inp.accept="application/json,.json";
  inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;if(f.size>3_000_000){showToast(icon("close",16),"Fitxer massa gran");return}const r=new FileReader();
@@ -1282,7 +1245,6 @@ function importData(){
  inp.click();
 }
 
-/* ===================== ONBOARDING ===================== */
 const OB=[
  {ic:"slate",h:"The Hollywood Protocol",p:`El teu company per a un pla fix de força i calistènia. La idea és simple: <b>el pla pensa, tu executes</b>.`},
  {ic:"book",h:"El pla ja està decidit",p:`Empenta · Estirada · Cames, dues voltes per cicle de 8 dies. No tries rutina ni càrrega des de zero: cada dia tens un <b>call sheet</b> amb el que toca.`},
@@ -1303,36 +1265,6 @@ function buildOnboarding(){
 function obNext(){if(obIdx>=OB.length-1)finishOnboarding();else{obIdx++;haptic("sel");buildOnboarding()}}
 function finishOnboarding(){D.onboarded=1;save();haptic("tick");buildHome()}
 
-/* ===================== eventos (pantallas nuevas) ===================== */
-document.addEventListener("click",e=>{
- const t=e.target.closest("[data-a]");if(!t)return;const a=t.dataset.a;
- switch(a){
-  case "tab":goTab(t.dataset.t);break;
-  case "obnext":obNext();break;
-  case "obskip":finishOnboarding();break;
-  case "josound":D.set.sound=D.set.sound?0:1;save();haptic("sel");buildJo();break;
-  case "joauto":D.set.autopacer=D.set.autopacer?0:1;save();haptic("sel");buildJo();break;
-  case "joprep":{const pp=D.set.prep||6;D.set.prep=pp>=7?5:pp+1;save();haptic("sel");buildJo()}break;
-  case "joperf":D.set.perf=D.set.perf?0:1;applyPrefs();save();haptic("sel");buildJo();break;
-  case "jotest":ensureAudio();sndPrep();setTimeout(sndDown,450);setTimeout(sndPause,900);setTimeout(sndUp,1350);setTimeout(sndDone,1850);haptic("soft");break;
-  case "joexport":exportData();showToast(icon("check",16),"Còpia desada · "+todayISO());break;
-  case "joexportcsv":exportCSV();showToast(icon("check",16),"CSV desat · "+todayISO());break;
-  case "joimport":importData();break;
-  case "joundo":{const last=D.history[D.history.length-1];if(!last){showToast(icon("list",16),"No hi ha cap sessió per desfer");break}openSheet(`<div class="sheetlbl" style="color:var(--warn)">${icon("undo",12)} Desfer última sessió?</div><div class="note" style="margin-top:14px">Es traurà ${esc((SESSIONS[last.sessionKey]||{name:last.sessionKey}).name)} del ${fmtD(last.dateISO)}, es revertiran les pujades de nivell d'aquesta sessió i el cicle tornarà un dia enrere.</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="closeover">Cancel·lar</button><button class="fnav tap" data-a="joundook" style="background:rgba(255,178,89,.16);color:var(--warn)">Desfer</button></div>`)}break;
-  case "joundook":undoLastSession();break;
-  case "joreset":openSheet(`<div class="sheetlbl" style="color:var(--bad)">${icon("close",12)} Esborrar-ho tot?</div><div class="note" style="margin-top:14px">S'esborraran historial, nivells i ajustos. No es pot desfer. Exporta una còpia abans si vols conservar-ho.</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="closeover">Cancel·lar</button><button class="fnav tap" data-a="joresetok" style="background:rgba(255,100,100,.16);color:var(--bad)">Esborrar tot</button></div>`);break;
-  case "joresetok":D=fresh();save();closeOver();obIdx=0;haptic("heavy");buildHome();break;
-  case "jodeload":startDeload();showToast(icon("check",16),"Deload activat · 8 dies");buildJo();break;
-  case "joreentry":startReentry();showToast(icon("check",16),"Readaptació activada · 8 dies");buildJo();break;
-  case "jocyclefwd":D.cycleIndex=(D.cycleIndex+1)%8;save();haptic("sel");buildJo();break;
-  case "jocycleback":D.cycleIndex=(D.cycleIndex+7)%8;save();haptic("sel");buildJo();break;
-  case "joeditlast":editLastSession(t.dataset.from||"jo");break;
-  case "elrir":elSetRir(t.dataset.x,+t.dataset.s,+t.dataset.r);break;
-  case "elsave":applyEditLast();break;
- }
-});
-
-/* ===================== arranque (tras todo) ===================== */
 (async function(){try{await initStore()}catch(e){}boot()})();
 
 </script>
