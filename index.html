@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230B0E15'/%3E%3Cpath d='M38 52h116v88H38z' fill='none' stroke='%23E8B45A' stroke-width='10'/%3E%3Cpath d='M54 74h84M54 96h64M54 118h48' stroke='%233B82FF' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230B0E15'/%3E%3Cpath d='M38 52h116v88H38z' fill='none' stroke='%23E8B45A' stroke-width='10'/%3E%3Cpath d='M54 74h84M54 96h64M54 118h48' stroke='%233B82FF' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="description" content="Companion offline per al protocol d’entrenament The Hollywood Protocol.">
-<title>The Hollywood Protocol · Companion v10.1 Final</title>
+<title>The Hollywood Protocol · Companion v10.2 QoL</title>
 <style>
 :root{
   --paper:#F4F6F9; --ptxt:#0E1320;
@@ -145,7 +145,8 @@ svg{display:block}
 .wball{fill:var(--acc);filter:drop-shadow(0 0 8px rgba(59,130,255,.85))}
 .wlane{stroke:var(--hair);stroke-width:1;stroke-dasharray:3 6}
 .wave.glow .wball{fill:#8fc0ff;filter:drop-shadow(0 0 14px rgba(143,192,255,1))}
-.wcount{position:absolute;top:0;right:8px;font-family:var(--mono);font-size:44px;font-weight:600;line-height:1;color:var(--paper);text-align:right}
+.wcount{position:absolute;top:0;right:8px;font-family:var(--mono);font-size:44px;font-weight:600;line-height:1;color:var(--paper);text-align:right;transition:color .2s}
+.wcount.fail{color:var(--bad)}
 .wcount small{font-size:10.5px;font-weight:400;color:var(--mut);letter-spacing:.8px;display:block;margin-top:3px;text-transform:uppercase}
 .wph{position:absolute;top:6px;left:6px;font-family:var(--mono);font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
 .wave.glow .wph{color:#8fc0ff}.wave.run .wph{color:var(--acc)}
@@ -466,7 +467,7 @@ function sanitizeDraft(d){
  if(!d||typeof d!=="object"||!validISO(d.dateISO)||!SESSIONS[d.sk]||!d.sets||typeof d.sets!=="object")return null;
  const sets={};SESSIONS[d.sk].ex.forEach(ex=>{const arr=Array.isArray(d.sets[ex.id])?d.sets[ex.id].map(cleanSet).slice(0,12):[];if(arr.length)sets[ex.id]=arr});
  if(!Object.keys(sets).length)return null;
- return{sk:d.sk,dateISO:d.dateISO,t0:Math.round(clamp(d.t0,0,Date.now(),Date.now())),soft:d.soft?1:0,sets,verdicts:sanitizeVerdicts(d.verdicts),ei:Math.round(clamp(d.ei,0,SESSIONS[d.sk].ex.length-1,0)),si:Math.round(clamp(d.si,0,12,0)),sideIdx:Math.round(clamp(d.sideIdx,0,1,0)),phase:"set"};
+ return{sk:d.sk,dateISO:d.dateISO,t0:Math.round(clamp(d.t0,0,Date.now(),Date.now())),soft:d.soft?1:0,sets,verdicts:sanitizeVerdicts(d.verdicts),ei:Math.round(clamp(d.ei,0,SESSIONS[d.sk].ex.length-1,0)),si:Math.round(clamp(d.si,0,12,0)),sideIdx:Math.round(clamp(d.sideIdx,0,1,0)),phase:"set",note:typeof d.note==="string"?d.note.slice(0,500):""};
 }
 function sanitizeData(obj){
  const base=fresh();if(!obj||typeof obj!=="object")return base;
@@ -476,7 +477,7 @@ function sanitizeData(obj){
  base.v=10;base.onboarded=obj.onboarded?1:0;base.cycleIndex=Math.round(clamp(obj.cycleIndex,0,999,0))%CYCLE.length;
  base.startDate=validISO(obj.startDate)?obj.startDate:todayISO();base.lastBackup=validISO(obj.lastBackup)?obj.lastBackup:null;base.lastDeload=validISO(obj.lastDeload)?obj.lastDeload:base.startDate;base.deloadUntil=validISO(obj.deloadUntil)?obj.deloadUntil:null;base.deloadMode=(obj.deloadMode==="reentry"||obj.deloadMode==="deload")?obj.deloadMode:null;
  base.levels={};if(obj.levels&&typeof obj.levels==="object")Object.keys(obj.levels).slice(0,ALL_EX.length).forEach(id=>{if(EX(id))base.levels[id]=Math.round(clamp(obj.levels[id],0,999,0))});
- base.history=Array.isArray(obj.history)?obj.history.map(h=>{const entries=sanitizeEntries(h&&h.entries);if(!Object.keys(entries).length)return null;return{id:Math.round(clamp(h.id,0,Number.MAX_SAFE_INTEGER,Date.now())),dateISO:validISO(h.dateISO)?h.dateISO:todayISO(),sessionKey:SESSIONS[h.sessionKey]?h.sessionKey:"PUSH_A",deload:!!h.deload,soft:!!h.soft,entries,levelUps:Array.isArray(h.levelUps)?h.levelUps.filter(id=>EX(id)).slice(0,50):[],dec:sanitizeDec(h.dec),dur:Math.round(clamp(h.dur,1,400,1))}}).filter(Boolean).slice(-1500):[];
+ base.history=Array.isArray(obj.history)?obj.history.map(h=>{const entries=sanitizeEntries(h&&h.entries);if(!Object.keys(entries).length)return null;return{id:Math.round(clamp(h.id,0,Number.MAX_SAFE_INTEGER,Date.now())),dateISO:validISO(h.dateISO)?h.dateISO:todayISO(),sessionKey:SESSIONS[h.sessionKey]?h.sessionKey:"PUSH_A",deload:!!h.deload,soft:!!h.soft,entries,levelUps:Array.isArray(h.levelUps)?h.levelUps.filter(id=>EX(id)).slice(0,50):[],dec:sanitizeDec(h.dec),dur:Math.round(clamp(h.dur,1,400,1)),note:typeof h.note==="string"?h.note.slice(0,500):""}}).filter(Boolean).slice(-1500):[];
  const draft=sanitizeDraft(obj.draft);if(draft)base.draft=draft;
  return base;
 }
@@ -668,7 +669,9 @@ Object.assign(ICO,{
  plus:'<path d="M12 5v14M5 12h14"/>',
  list:'<path d="M4 7h16M4 12h16M4 17h16"/>',
  close:'<path d="M6 6l12 12M18 6L6 18"/>',
- cal:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4M15 3v4"/>'
+ cal:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4M15 3v4"/>',
+ copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+ note:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>'
 });
 function figStaticNamed(ex,size){return figStatic(ex,size).replace('<svg ','<svg class="hero-fig" ')}
 
@@ -748,6 +751,7 @@ function buildFocus(){
  +'<div class="fhead">'
    +'<button class="fx tap tap-sm" data-a="exit" id="exitBtn" aria-label="Sortir de l\'entreno">✕</button>'
    +'<div class="fprog"><div class="fslate"><span id="fprogtxt">—</span></div><div class="fbar"><i id="fbar" style="width:0%"></i></div></div>'
+   +'<button class="fx tap tap-sm" data-a="notes" aria-label="Notes de la sessió">'+icon("note",20)+'</button>'
    +'<button class="fx tap tap-sm" data-a="list" aria-label="Llista d\'exercicis">'+icon("list",20)+'</button>'
  +'</div>'
  +'<div class="fbody">'
@@ -779,15 +783,25 @@ function buildFocus(){
      +'<button class="tap" data-a="rir" data-r="3" aria-label="Desar sèrie amb RIR 3 o més">3+<small>fàcil</small></button>'
    +'</div></div>'
  +'</div>'
- +'<div class="ffoot"><button class="fnav tap" data-a="prev">'+icon("chevL",16)+' Anterior</button><button class="fnav tap" data-a="addset" id="addbtn" style="display:none;flex:0 0 auto;padding:0 18px">'+icon("plus",16)+'</button><button class="fnav tap" data-a="next">Següent '+icon("chevR",16)+'</button></div>'
+ +'<div class="ffoot"><button class="fnav tap" data-a="prev">'+icon("chevL",16)+' Anterior</button><button class="fnav tap" data-a="copyset" id="copybtn" style="flex:0 0 auto;padding:0 18px" aria-label="Copiar sèrie anterior">'+icon("copy",18)+'</button><button class="fnav tap" data-a="addset" id="addbtn" style="display:none;flex:0 0 auto;padding:0 18px">'+icon("plus",16)+'</button><button class="fnav tap" data-a="next">Següent '+icon("chevR",16)+'</button></div>'
  +'</div>';
  swap(html,()=>{cacheFocusRefs();attachWheel("reps");attachWheel("kg");attachSwipe();syncFocus();kickFrame()});
 }
 
 function cacheFocusRefs(){
  const q=s=>document.getElementById(s);
- F={scr:q("focusScreen"),exitBtn:q("exitBtn"),prog:q("fprogtxt"),bar:q("fbar"),figEl:q("figEl"),eyebrow:q("heyebrow"),name:q("hname"),doTxt:q("fdotxt"),doCaret:q("fdocaret"),serie:q("bserie"),objr:q("bobj"),sidepill:q("sidepill"),savedWrap:q("savedwrap"),savedTxt:q("savedtxt"),wavebox:q("wavebox"),wph:q("wph"),wcount:q("wcountn"),wcountUnit:q("wcountu"),wgrp:q("wgrp"),wpath:q("wpath"),wball:q("wball"),pbtn:q("pbtn"),chips:q("chips"),info:q("infoblk"),wheelreps:q("whreps"),wheelkg:q("whkg"),wlabReps:q("wlabreps"),rirHint:q("rirhint"),addBtn:q("addbtn"),figBones:[],figHead:null,_exId:null};
+ F={scr:q("focusScreen"),exitBtn:q("exitBtn"),prog:q("fprogtxt"),bar:q("fbar"),figEl:q("figEl"),eyebrow:q("heyebrow"),name:q("hname"),doTxt:q("fdotxt"),doCaret:q("fdocaret"),serie:q("bserie"),objr:q("bobj"),sidepill:q("sidepill"),savedWrap:q("savedwrap"),savedTxt:q("savedtxt"),wavebox:q("wavebox"),wph:q("wph"),wcount:q("wcountn"),wcountUnit:q("wcountu"),wgrp:q("wgrp"),wpath:q("wpath"),wball:q("wball"),pbtn:q("pbtn"),chips:q("chips"),info:q("infoblk"),wheelreps:q("whreps"),wheelkg:q("whkg"),wlabReps:q("wlabreps"),rirHint:q("rirhint"),addBtn:q("addbtn"),copyBtn:q("copybtn"),figBones:[],figHead:null,_exId:null};
  F.figEl.innerHTML=figInner();recacheFig();
+}
+
+function checkRepColor(){
+    if(!UI.workout||!F.wcount)return;
+    const ex=curEx(),s=curDraft().sets[UI.workout.si];
+    if(!P && s.r>0 && s.r<ex.rep[0]){
+        F.wcount.style.color="var(--bad)";
+    } else if(!P) {
+        F.wcount.style.color="var(--paper)";
+    }
 }
 
 function syncFocus(){
@@ -814,6 +828,7 @@ function syncFocus(){
  F.addBtn.style.display=(w.si===d.sets.length-1)?"flex":"none";
  F.exitBtn.textContent=UI.exitArm?"✕?":"✕";
  syncWheels(exChanged);
+ checkRepColor();
  F._exId=ex.id;setMode();
 }
 
@@ -823,15 +838,41 @@ function wheelItems(kind,ex){const vals=wheelVals(kind,ex);let h='<div class="wp
 function updateWheelA11y(kind,val,ex){const el=F["wheel"+kind];if(!el)return;const max=kind==="kg"?120:ex_time_max();const label=kind==="kg"?(val+" kg"):(val+(ex&&ex.time?" segons":" reps"));el.setAttribute("aria-valuemin","0");el.setAttribute("aria-valuemax",String(max));el.setAttribute("aria-valuenow",String(val));el.setAttribute("aria-valuetext",label)}
 function attachWheel(kind){
  const el=F["wheel"+kind];if(!el)return;let tm=null;
- const commit=v=>{if(kind==="kg")applyKg(v);else{const st=curDraft().sets[UI.workout.si];st.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v}updateWheelA11y(kind,v,curEx());haptic("sel");saveDraft()};
+ const commit=v=>{if(kind==="kg")applyKg(v);else{const st=curDraft().sets[UI.workout.si];st.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;checkRepColor();}updateWheelA11y(kind,v,curEx());haptic("sel");saveDraft()};
  el.addEventListener("scroll",()=>{if(tm)clearTimeout(tm);tm=setTimeout(()=>{if(Date.now()<(F.silentUntil||0))return;const ex=curEx();let i=Math.round(el.scrollTop/ITEM_H);const vals=wheelVals(kind,ex);i=Math.max(0,Math.min(i,vals.length-1));el.scrollTo({top:i*ITEM_H,behavior:reduceMotion()?"auto":"smooth"});commit(vals[i])},150)},{passive:true});
  el.addEventListener("click",e=>{const it=e.target.closest("[data-wi]");if(it)el.scrollTo({top:(+it.dataset.wi)*ITEM_H,behavior:reduceMotion()?"auto":"smooth"})});
  el.addEventListener("keydown",e=>{const ex=curEx(),vals=wheelVals(kind,ex),st=curDraft().sets[UI.workout.si];let i=wheelIdx(kind,ex,kind==="kg"?(st.k||0):(st.r||0));if(e.key==="ArrowUp"||e.key==="ArrowRight")i++;else if(e.key==="ArrowDown"||e.key==="ArrowLeft")i--;else if(e.key==="PageUp")i+=5;else if(e.key==="PageDown")i-=5;else if(e.key==="Home")i=0;else if(e.key==="End")i=vals.length-1;else return;e.preventDefault();i=Math.max(0,Math.min(i,vals.length-1));commit(vals[i]);setWheel(kind,vals[i])});
 }
 function syncWheels(rebuild){F.silentUntil=Date.now()+500;const ex=curEx(),s=curDraft().sets[UI.workout.si];["reps","kg"].forEach(kind=>{const el=F["wheel"+kind];if(!el)return;if(rebuild)el.innerHTML=wheelItems(kind,ex);const val=kind==="kg"?(s.k||0):(s.r||0);el.scrollTop=wheelIdx(kind,ex,val)*ITEM_H;updateWheelA11y(kind,val,ex)});if(F.wlabReps)F.wlabReps.textContent=ex.time?"segons":("reps"+(ex.side?" /"+ex.side:""))}
 function setWheel(kind,val){F.silentUntil=Date.now()+600;const el=F["wheel"+kind];if(el){el.scrollTo({top:wheelIdx(kind,curEx(),val)*ITEM_H,behavior:reduceMotion()?"auto":"smooth"});updateWheelA11y(kind,val,curEx())}}
-function nudge(kind,delta){const w=UI.workout;if(!w)return;const s=curDraft().sets[w.si];if(kind==="kg"){let v=Math.max(0,Math.min(120,(s.k||0)+delta));v=Math.round(v*2)/2;applyKg(v);setWheel("kg",v)}else{let v=Math.max(0,Math.min(ex_time_max(),(s.r||0)+delta));s.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;setWheel("reps",v)}updateWheelA11y(kind,kind==="kg"?(s.k||0):(s.r||0),curEx());haptic("sel");saveDraft()}
+function nudge(kind,delta){const w=UI.workout;if(!w)return;const s=curDraft().sets[w.si];if(kind==="kg"){let v=Math.max(0,Math.min(120,(s.k||0)+delta));v=Math.round(v*2)/2;applyKg(v);setWheel("kg",v)}else{let v=Math.max(0,Math.min(ex_time_max(),(s.r||0)+delta));s.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;setWheel("reps",v)}updateWheelA11y(kind,kind==="kg"?(s.k||0):(s.r||0),curEx());checkRepColor();haptic("sel");saveDraft()}
 function ex_time_max(){return curEx().time?120:30}
+
+function copySet(){
+    const w=UI.workout;if(!w)return;
+    const d=curDraft(),s=d.sets[w.si];
+    let target=null;
+    if(w.si>0) target=d.sets[w.si-1];
+    else {
+        const last=lastEntries(curEx().id,1)[0];
+        if(last&&last.sets&&last.sets.length) target=last.sets[0];
+    }
+    if(target){
+        s.r=target.r||0; s.k=target.k||0;
+        curDraft().touched=true;
+        syncFocus();
+        setWheel("reps",s.r);
+        setWheel("kg",s.k);
+        if(F.wcount&&!P)F.wcount.textContent=s.r;
+        checkRepColor();
+        haptic("tick");
+        showToast(icon("check",16),"Sèrie copiada");
+        saveDraft();
+    }else{
+        haptic("warn");
+        showToast(icon("close",16),"No hi ha sèrie anterior per copiar");
+    }
+}
 
 function kickFrame(){figT0=performance.now();if(reduceMotion()&&!P){const Fg=FIG[curEx().fig]||FIG.squat;figDrawCached(Fg.A);return}if(!Fraf)Fraf=requestAnimationFrame(frame)}
 function pacerStart(){ensureAudio();P={t0:performance.now(),reps:0,lastTick:-1,lastPhase:""};if(F.pbtn)F.pbtn.innerHTML=icon("pause",15)+" Atura el ritme";if(F.wavebox)F.wavebox.classList.add("run");haptic("tick");kickFrame()}
@@ -845,13 +886,12 @@ function pacerStop(commit){
   if(F.pbtn)F.pbtn.innerHTML=icon("play",15)+" Marca'm el ritme";
   if(F.wavebox)F.wavebox.classList.remove("run","glow");
   if(F.wph)F.wph.textContent="▶ marca el ritme";
-  
-  // FIX: Resetear la posición de la onada i la pilota
   if(F.wgrp)F.wgrp.setAttribute("transform","translate(0,0)");
   if(F.wball){
     F.wball.setAttribute("cx", WV.BX);
     F.wball.setAttribute("cy", ((WV.T+WV.B)/2).toFixed(1));
   }
+  checkRepColor();
 }
 function frame(now){
  if(!UI.workout||!F.scr||!document.body.contains(F.scr)){Fraf=0;return}
@@ -904,7 +944,9 @@ function buildRestOverlay(){
  else if(r.pr)h+='<div class="prbadge">'+icon("flame",15)+' Rècord personal</div>';
  h+='<div class="rring"><svg width="248" height="248"><circle class="rring-bg" cx="124" cy="124" r="112"/><circle class="rring-fg" id="rringfg" cx="124" cy="124" r="112" stroke-dasharray="'+RING_RC.toFixed(1)+'" stroke-dashoffset="0"/></svg><div class="rnum"><b id="rnum">'+fmtT(r.total)+'</b><span>descans</span></div></div>';
  h+='<div class="rnext"><div class="nl">'+(r.nx?"Següent":"Final")+'</div>'+(r.nx?'<div class="figmini">'+figStatic(curS().ex[r.nx.ei],62)+'</div>':'')+'<div class="nv">'+esc(r.label)+'</div></div>';
- h+='<div class="rbtns"><button class="fnav tap" data-a="restundo">'+icon("undo",15)+' Refer</button><button class="fnav tap" data-a="plus30">+30 s</button><button class="fnav tap" data-a="skiprest" style="background:var(--accso);color:var(--acc2)">Saltar →</button></div>';
+ const isLast=!r.nx;
+ const skipTxt=isLast?"Acabar i guardar →":"Saltar →";
+ h+='<div class="rbtns"><button class="fnav tap" data-a="restundo">'+icon("undo",15)+' Refer</button><button class="fnav tap" data-a="plus30">+30 s</button><button class="fnav tap" data-a="skiprest" style="background:var(--accso);color:var(--acc2)">'+skipTxt+'</button></div>';
  const ov=document.createElement("div");ov.className="restwrap";ov.id="restwrap";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Descans");ov.tabIndex=-1;
  ov.innerHTML='<div aria-live="assertive" class="noselect" style="position:absolute;left:-9999px" id="restlive"></div>'+h;
  document.body.appendChild(ov);
@@ -941,7 +983,7 @@ function finishWorkout(force){
  const shortN=n=>n.split(" (")[0].split(" ·")[0];const an={up:[],down:[],easy:[]};
  Object.keys(dec).forEach(id=>{const c=dec[id],nm=shortN(EX(id).name);if((c==="level"||c==="levelBig")&&ups.indexOf(id)>=0)an.up.push(nm);else if(c==="addset")an.up.push(nm);else if(c==="down")an.down.push(nm);else if(c==="easy")an.easy.push(nm)});
  ups.forEach(id=>{D.levels[id]=(D.levels[id]||0)+1});
- D.history.push({id:Date.now(),dateISO:todayISO(),sessionKey:w.sk,deload:!!deloadActive(),soft:!!w.soft,entries,levelUps:ups,dec,dur});
+ D.history.push({id:Date.now(),dateISO:todayISO(),sessionKey:w.sk,deload:!!deloadActive(),soft:!!w.soft,entries,levelUps:ups,dec,dur,note:w.note||""});
  D.cycleIndex=(D.cycleIndex+1)%8;
  if(gBefore!=null&&gBefore>=7)D.lastDeload=todayISO();
  D.draft=null;save();
@@ -972,7 +1014,26 @@ document.addEventListener("keydown",e=>{const host=document.getElementById("over
 function attachSheetDrag(sh){let y0=null,dy=0;sh.addEventListener("touchstart",e=>{if(sh.scrollTop>2)return;y0=e.touches[0].clientY;dy=0;sh.style.transition="none"},{passive:true});sh.addEventListener("touchmove",e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform="translateY("+dy+"px)"},{passive:true});sh.addEventListener("touchend",()=>{if(y0==null)return;sh.style.transition="";sh.style.transform="";if(dy>110){closeOver();haptic("sel")}y0=null},{passive:true})}
 function openList(){const w=UI.workout,S=curS();let h='<div class="sheetlbl">'+icon("list",12)+' '+esc(S.name)+'</div>';S.ex.forEach((e,i)=>{const d=w.draft[e.id],done=d.sets.filter(x=>x.rir!=null&&x.r>0).length,cur=i===w.ei;h+='<button class="oline tap'+(cur?" cur":"")+'" data-a="jump" data-i="'+i+'" style="width:100%;text-align:left"><span class="n">'+esc(e.name.split(" (")[0])+(e.star?' ★':'')+'</span><span class="st">'+done+'/'+d.sets.length+'</span></button>'});h+='<button class="btn btn-acc tap" data-a="gofinish" style="margin-top:16px">Acabar i guardar</button>';openSheet(h)}
 function openPlates(){const ex=curEx(),s=curDraft().sets[UI.workout.si],total=s.k||0,pl=plates(total);let h='<div class="sheetlbl">'+icon("weight",12)+' Discos per costat · '+total+' kg</div>';if(pl.bar){h+='<div class="note" style="margin-top:14px">Amb '+total+' kg n\'hi ha prou amb la barra (20 kg) o menys. Sense discos.</div>'}else{h+='<div style="margin-top:8px">';pl.out.forEach(o=>{h+='<div class="plrow"><span>'+o.p+' kg</span><span>× '+o.n+'</span></div>'});if(pl.rem>.01)h+='<div class="plrow" style="color:var(--warn)"><span>Resta</span><span>'+pl.rem+' kg</span></div>';h+='</div><div class="note">Barra 20 kg + discos per costat. Total a la barra: '+total+' kg.</div>'}openSheet(h)}
-function openSettings(replace){const set=D.set,sw=on=>'<span class="sw'+(on?" on":"")+'"><i></i></span>';let h='<div class="sheetlbl">'+icon("gear",12)+' Ajustos</div>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.sound?"true":"false")+'" data-a="togglesound" style="width:100%;text-align:left"><span>So del marcador</span>'+sw(set.sound)+'</button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.autopacer?"true":"false")+'" data-a="toggleauto" style="width:100%;text-align:left"><span>Iniciar ritme automàtic</span>'+sw(set.autopacer)+'</button>';h+='<button class="srow tap" data-a="cycleprep" style="width:100%;text-align:left"><span>Compte enrere d\'inici</span><span class="st">'+(set.prep||6)+' s</span></button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.perf?"true":"false")+'" data-a="toggleperf" style="width:100%;text-align:left"><span>Mode rendiment</span>'+sw(set.perf)+'</button>';h+='<button class="srow tap" data-a="testsound" style="width:100%;text-align:left"><span>Provar so</span><span class="st">'+icon("play",15)+'</span></button>';h+='<button class="srow tap" data-a="backup" style="width:100%;text-align:left"><span>Exportar còpia (.json)</span><span class="st">'+icon("undo",15)+'</span></button>';h+='<button class="srow tap" data-a="backupcsv" style="width:100%;text-align:left"><span>Exportar historial (.csv)</span><span class="st">CSV</span></button>';h+='<div class="note"><b>v10.1 Final:</b> HTML autònom, cache offline si s\'inclou el sw.js del paquet, data local amb conflictes resolts, importació validada, CSV, focus/teclat en panells i mode rendiment. <br><br><b>Sobre la vibració:</b> a iOS el web només pot donar resposta tàctil limitada. Per a hàptica rica i alarmes amb pantalla bloquejada cal versió nativa.</div>';if(replace){const sh=document.querySelector("#overlay-host .sheet2");if(sh){sh.innerHTML=h;return}}openSheet(h)}
+function openNotes(){
+    if(!UI.workout)return;
+    const note=UI.workout.note||"";
+    let html='<div class="sheetlbl">'+icon("note",12)+' Notes de la sessió</div>';
+    html+='<div class="note" style="margin-top:10px">Anota com et sents, si el gym estava ple, o si tens algun dolor. L\'app ho guardarà al historial.</div>';
+    html+='<textarea id="noteinp" style="width:100%;min-height:120px;background:var(--surf2);color:var(--txt);border:1px solid var(--hair);border-radius:12px;padding:10px;margin-top:10px;font-family:var(--disp);font-size:14px;" maxlength="500" placeholder="Ex: Molt cansat avui. Maluc dreta marca">'+esc(note)+'</textarea>';
+    html+='<div class="rbtns" style="margin-top:16px"><button class="fnav tap" data-a="savenote">Desar nota</button></div>';
+    openSheet(html);
+    setTimeout(()=>{const inp=document.getElementById("noteinp");if(inp)inp.focus();},300);
+}
+function saveNote(){
+    const inp=document.getElementById("noteinp");
+    if(inp&&UI.workout){
+        UI.workout.note=inp.value.slice(0,500);
+        saveDraft();haptic("sel");
+        showToast(icon("check",16),"Nota desada");
+    }
+    closeOver();
+}
+function openSettings(replace){const set=D.set,sw=on=>'<span class="sw'+(on?" on":"")+'"><i></i></span>';let h='<div class="sheetlbl">'+icon("gear",12)+' Ajustos</div>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.sound?"true":"false")+'" data-a="togglesound" style="width:100%;text-align:left"><span>So del marcador</span>'+sw(set.sound)+'</button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.autopacer?"true":"false")+'" data-a="toggleauto" style="width:100%;text-align:left"><span>Iniciar ritme automàtic</span>'+sw(set.autopacer)+'</button>';h+='<button class="srow tap" data-a="cycleprep" style="width:100%;text-align:left"><span>Compte enrere d\'inici</span><span class="st">'+(set.prep||6)+' s</span></button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.perf?"true":"false")+'" data-a="toggleperf" style="width:100%;text-align:left"><span>Mode rendiment</span>'+sw(set.perf)+'</button>';h+='<button class="srow tap" data-a="testsound" style="width:100%;text-align:left"><span>Provar so</span><span class="st">'+icon("play",15)+'</span></button>';h+='<button class="srow tap" data-a="backup" style="width:100%;text-align:left"><span>Exportar còpia (.json)</span><span class="st">'+icon("undo",15)+'</span></button>';h+='<button class="srow tap" data-a="backupcsv" style="width:100%;text-align:left"><span>Exportar historial (.csv)</span><span class="st">CSV</span></button>';h+='<div class="note"><b>v10.2 QoL:</b> HTML autònom, cache offline, notes de sessió, còpia ràpida de sèries, alerta visual de sèrie fallida i drecera per acabar. <br><br><b>Sobre la vibració:</b> a iOS el web només pot donar resposta tàctil limitada. Per a hàptica rica i alarmes amb pantalla bloquejada cal versió nativa.</div>';if(replace){const sh=document.querySelector("#overlay-host .sheet2");if(sh){sh.innerHTML=h;return}}openSheet(h)}
 function openConfirmFinish(names){let h='<div class="sheetlbl">'+icon("list",12)+' Acabar sense desar-ho tot?</div><div class="note" style="margin-top:14px">Aquests exercicis no tenen cap sèrie registrada i no es desaran:</div><div style="margin-top:8px">'+names.map(n=>'<div class="plrow"><span>'+esc(n)+'</span><span class="mut">sense dades</span></div>').join("")+'</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="cancelfinish">Tornar</button><button class="fnav tap" data-a="forcefinish" style="background:var(--accso);color:var(--acc2)">Desar igualment →</button></div>';openSheet(h)}
 
 function exitWorkout(){UI.exitArm=0;const w=UI.workout;pacerStop(false);if(w&&w.restIv)clearInterval(w.restIv);const ov=document.getElementById("restwrap");if(ov)ov.remove();if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}wakeOff();saveDraft();UI.workout=null;F={};buildHome()}
@@ -980,7 +1041,7 @@ function downloadBlob(name,type,text){const blob=new Blob([text],{type});const a
 function exportData(){try{downloadBlob("hollywood-protocol-backup-"+todayISO()+".json","application/json",JSON.stringify(D,null,1));D.lastBackup=todayISO();save()}catch(e){}}
 function csvCell(v){v=v==null?"":String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 function exportCSV(){try{const rows=[["date","session","exercise_id","exercise","set","reps_or_seconds","kg","rir","level_up","duration_min"]];D.history.forEach(h=>{Object.keys(h.entries||{}).forEach(id=>{const ex=EX(id),e=h.entries[id];(e.sets||[]).forEach((st,i)=>rows.push([h.dateISO,h.sessionKey,id,ex?ex.name:id,i+1,st.r||0,st.k||0,st.rir==null?"":st.rir,(h.levelUps||[]).indexOf(id)>=0?1:0,h.dur||""]))})});downloadBlob("hollywood-protocol-history-"+todayISO()+".csv","text/csv;charset=utf-8",rows.map(r=>r.map(csvCell).join(",")).join("\n"));D.lastBackup=todayISO();save()}catch(e){showToast(icon("close",16),"No s'ha pogut exportar CSV")}}
-function saveDraft(){const w=UI.workout;if(!w){D.draft=null;save();return}const sets={};curS().ex.forEach(e=>{sets[e.id]=w.draft[e.id].sets.map(s=>({r:s.r,k:s.k,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL}))});D.draft={sk:w.sk,dateISO:todayISO(),t0:w.t0,soft:w.soft?1:0,sets,verdicts:w.verdicts||{},ei:w.ei,si:w.si,sideIdx:w.sideIdx,phase:w.phase};save()}
+function saveDraft(){const w=UI.workout;if(!w){D.draft=null;save();return}const sets={};curS().ex.forEach(e=>{sets[e.id]=w.draft[e.id].sets.map(s=>({r:s.r,k:s.k,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL}))});D.draft={sk:w.sk,dateISO:todayISO(),t0:w.t0,soft:w.soft?1:0,sets,verdicts:w.verdicts||{},ei:w.ei,si:w.si,sideIdx:w.sideIdx,phase:w.phase,note:w.note||""};save()}
 function startWorkout(){
  const sk=CYCLE[D.cycleIndex%8];if(sk==="REST")return;
  const S=SESSIONS[sk],draft={},t=gapTier();
@@ -994,7 +1055,7 @@ function startWorkout(){
   else for(let i=0;i<n;i++){const p=prev&&prev.sets[Math.min(i,prev.sets.length-1)];sets.push({r:p?p.r:0,k:p?p.k:0,rir:null})}
   draft[ex.id]={sets,touched:false,sug};
  });
- UI.workout={sk,draft,ei:0,si:0,sideIdx:0,phase:"set",soft:res?!!res.soft:(t===2&&!deloadActive()),rest:null,info:false,t0:res?res.t0:Date.now(),verdicts:res?(res.verdicts||{}):{},restIv:null};
+ UI.workout={sk,draft,ei:0,si:0,sideIdx:0,phase:"set",soft:res?!!res.soft:(t===2&&!deloadActive()),rest:null,info:false,t0:res?res.t0:Date.now(),verdicts:res?(res.verdicts||{}):{},restIv:null,note:res?(res.note||""):""};
  if(res){let nu=null;outer:for(let i=0;i<S.ex.length;i++){const ss=draft[S.ex[i].id].sets;for(let j=0;j<ss.length;j++)if(ss[j].rir==null){nu={ei:i,si:j};break outer}}if(nu){UI.workout.ei=nu.ei;UI.workout.si=nu.si;const ne=S.ex[nu.ei],st=draft[ne.id].sets[nu.si];UI.workout.sideIdx=(ne.side&&st&&st.rirL!=null)?1:0}else{UI.workout.ei=Math.min(res.ei||0,S.ex.length-1);UI.workout.si=Math.max(0,res.si||0);UI.workout.sideIdx=res.sideIdx?1:0}const ne=S.ex[UI.workout.ei];setTimeout(()=>showToast(icon("undo",16),"Sessió recuperada · continues a "+ne.name.split(" (")[0]),260)}
  wakeOn();saveDraft();buildFocus();
 }
@@ -1014,6 +1075,8 @@ document.addEventListener("click",e=>{
   case "tabsoon":showToast(icon("list",16),"Aquesta pestanya arriba a la versió completa.");break;
   case "exit":if(UI.exitArm){exitWorkout()}else{UI.exitArm=1;syncFocus();setTimeout(()=>{if(UI.exitArm){UI.exitArm=0;if(UI.workout&&F.scr)syncFocus()}},3000)}break;
   case "list":openList();break;
+  case "notes":openNotes();break;
+  case "savenote":saveNote();break;
   case "closeover":closeOver();break;
   case "info":UI.workout.info=!UI.workout.info;syncFocus();haptic("sel");break;
   case "pacer":if(P)pacerStop(true);else pacerStart();break;
@@ -1021,6 +1084,7 @@ document.addEventListener("click",e=>{
   case "clearset":clearSet();break;
   case "prev":navStep(-1);break;
   case "next":navStep(1);break;
+  case "copyset":copySet();break;
   case "addset":addSet();break;
   case "plates":openPlates();break;
   case "repminus":nudge("reps",-1);break;
@@ -1042,7 +1106,6 @@ document.addEventListener("click",e=>{
   case "cycleprep":{const pp=D.set.prep||6;D.set.prep=pp>=7?5:pp+1;save();haptic("sel");openSettings(true)}break;
   case "testsound":ensureAudio();sndPrep();setTimeout(sndDown,450);setTimeout(sndPause,900);setTimeout(sndUp,1350);setTimeout(sndDone,1850);haptic("soft");break;
   
-  // --- Events de les pantalles noves ---
   case "tab":goTab(t.dataset.t);break;
   case "obnext":obNext();break;
   case "obskip":finishOnboarding();break;
@@ -1111,7 +1174,6 @@ function buildProgress(){
  const st=stalledList();
  const stHtml=st.length?`<div class="scrtitle">Atenció · estancats</div><div class="chartcard"><div class="tagrow">${st.map(e=>`<span class="tag warn">${esc(e.name.split(" ·")[0].split(" (")[0])}</span>`).join("")}</div><div class="note">Tenen indicació especial al pròxim entreno (micro-salt forçat, sèrie extra o treure llast).</div></div>`:"";
  
- // FIX: Botons per editar qualsevol sessió passada
  const recent=H.slice(-20).reverse().map((s,ri)=>{
   const realIdx = H.length - 1 - ri;
   const nm=(SESSIONS[s.sessionKey]||{name:s.sessionKey}).name;
@@ -1171,7 +1233,7 @@ function buildJo(){
   <div class="chartcard"><button class="btn btn-ink tap" data-a="joexport" style="margin-bottom:10px">${icon("undo",15)} Exportar còpia (.json)</button><button class="btn btn-line tap" data-a="joexportcsv" style="margin-bottom:10px">Exportar historial (.csv)</button><button class="btn btn-line tap" data-a="joimport" style="margin-bottom:10px">Importar còpia</button><button class="btn btn-line tap" data-a="joeditlast" data-from="jo" style="margin-bottom:10px">Corregir pesos de l'última sessió</button><button class="btn btn-line tap" data-a="joundo" style="margin-bottom:10px">Desfer última sessió</button><button class="btn btn-ghost tap" data-a="joreset" style="color:var(--bad);border-color:rgba(255,100,100,.4)">Esborrar totes les dades</button>
    <div class="note">Estat: ${storageOK?"desant correctament al dispositiu":`<span style="color:var(--bad)">no es pot desar (mode privat?)</span>`}${D.lastBackup?` · última còpia ${fmtD(D.lastBackup)}`:" · sense còpia encara"}.</div></div>
   <div class="scrtitle">Sobre l'app</div>
-  <div class="chartcard"><div class="note" style="margin-top:0"><b>Companion v10.1 Final · build auditada.</b> Capa visual original conservada amb persistència robusta, drafts complets, importació validada, mode rendiment, export CSV segur i millores de focus/accessibilitat.<br><br><b>Vibració a iOS:</b> el web només permet resposta tàctil mínima. La háptica completa del Taptic Engine arriba amb la versió nativa (Capacitor). El temporitzador en segon pla es reconcilia en tornar a primer pla; l'alarma fiable amb pantalla bloquejada també és nativa.</div></div>
+  <div class="chartcard"><div class="note" style="margin-top:0"><b>Companion v10.2 QoL · build auditada.</b> Capa visual original conservada amb persistència robusta, drafts complets, importació validada, mode rendiment, export CSV segur i millores de focus/accessibilitat.<br><br><b>Vibració a iOS:</b> el web només permet resposta tàctil mínima. La háptica completa del Taptic Engine arriba amb la versió nativa (Capacitor). El temporitzador en segon pla es reconcilia en tornar a primer pla; l'alarma fiable amb pantalla bloquejada també és nativa.</div></div>
  </div>`+tabBar("jo"));
 }
 
@@ -1184,7 +1246,6 @@ function undoLastSession(){
  D.draft=null;save();closeOver();showToast(icon("undo",16),"Última sessió desfeta");buildJo();
 }
 
-// ===================== EDICIÓ DE SESSSIONS =====================
 function editSession(idx, from){
  if(idx<0 || idx>=D.history.length){showToast(icon("close",16),"Sessió no vàlida");return}
  const h=D.history[idx],S=SESSIONS[h.sessionKey];
