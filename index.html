@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230B0E15'/%3E%3Cpath d='M38 52h116v88H38z' fill='none' stroke='%23E8B45A' stroke-width='10'/%3E%3Cpath d='M54 74h84M54 96h64M54 118h48' stroke='%233B82FF' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230B0E15'/%3E%3Cpath d='M38 52h116v88H38z' fill='none' stroke='%23E8B45A' stroke-width='10'/%3E%3Cpath d='M54 74h84M54 96h64M54 118h48' stroke='%233B82FF' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="description" content="Companion offline per al protocol d’entrenament The Hollywood Protocol.">
-<title>The Hollywood Protocol · Companion v10.2 QoL</title>
+<title>The Hollywood Protocol · Companion v10.4</title>
 <style>
 :root{
   --paper:#F4F6F9; --ptxt:#0E1320;
@@ -452,14 +452,17 @@ async function initStore(){
  storageOK=!!idb||lsOK;
 }
 function lsTry(raw){try{localStorage.setItem(KEY,raw);return true}catch(e){return false}}
-function save(){D.updatedAt=Date.now();D.rev=(Number(D.rev)||0)+1;const raw=JSON.stringify(D);if(idb)idbSet(idb,"data",raw);lsTry(raw)}
+let _saveTm=null;
+function _flush(){const raw=JSON.stringify(D);if(idb)idbSet(idb,"data",raw);lsTry(raw)}
+function save(){if(_saveTm){clearTimeout(_saveTm);_saveTm=null}D.updatedAt=Date.now();D.rev=(Number(D.rev)||0)+1;_flush()}
+function saveSoon(){D.updatedAt=Date.now();D.rev=(Number(D.rev)||0)+1;if(_saveTm)return;_saveTm=setTimeout(function(){_saveTm=null;_flush()},500)}
 function clamp(n,min,max,def){n=Number(n);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):def}
 function validISO(x){
  if(typeof x!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(x))return false;
  const d=new Date(x+"T12:00:00");
  return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===x;
 }
-function cleanSet(s){return{r:Math.round(clamp(s&&s.r,0,500,0)),k:Math.round(clamp(s&&s.k,0,500,0)*10)/10,rir:(s&&s.rir==null)?null:Math.round(clamp(s&&s.rir,0,3,0)),rirL:(s&&s.rirL==null)?null:Math.round(clamp(s&&s.rirL,0,3,0))}}
+function cleanSet(s){const o={r:Math.round(clamp(s&&s.r,0,500,0)),k:Math.round(clamp(s&&s.k,0,500,0)*10)/10,rir:(s&&s.rir==null)?null:Math.round(clamp(s&&s.rir,0,3,0)),rirL:(s&&s.rirL==null)?null:Math.round(clamp(s&&s.rirL,0,3,0))};if(s&&s.rL!=null)o.rL=Math.round(clamp(s.rL,0,500,0));if(s&&s.kL!=null)o.kL=Math.round(clamp(s.kL,0,500,0)*10)/10;return o}
 function sanitizeEntries(entries){const out={};if(!entries||typeof entries!=="object")return out;Object.keys(entries).forEach(id=>{if(!EX(id))return;const sets=entries[id]&&Array.isArray(entries[id].sets)?entries[id].sets.map(cleanSet).filter(s=>s.r>0).slice(0,12):[];if(sets.length)out[id]={sets}});return out}
 function sanitizeDec(dec){const out={},ok={level:1,levelBig:1,addset:1,down:1,easy:1,hold:1};if(!dec||typeof dec!=="object")return out;Object.keys(dec).slice(0,80).forEach(id=>{if(EX(id)&&ok[dec[id]])out[id]=dec[id]});return out}
 function sanitizeVerdicts(vs){const out={},ok={level:1,levelBig:1,addset:1,down:1,easy:1,hold:1};if(!vs||typeof vs!=="object")return out;Object.keys(vs).slice(0,80).forEach(id=>{const v=vs[id];if(EX(id)&&v&&typeof v==="object"&&ok[v.code])out[id]={code:v.code,up:!!v.up,four:!!v.four,five:!!v.five}});return out}
@@ -486,8 +489,9 @@ window.addEventListener("pagehide",save);
 window.addEventListener("beforeunload",save);
 
 function lastEntries(exId,n){n=n||3;const out=[];for(let i=D.history.length-1;i>=0&&out.length<n;i--){const h=D.history[i];if(h.entries&&h.entries[exId])out.push({date:h.dateISO,sets:h.entries[exId].sets,up:(h.levelUps||[]).indexOf(exId)>=0})}return out}
-const bestScore=sets=>sets.reduce((m,s)=>Math.max(m,(s.k||0)*1000+(s.r||0)),0);
-const allTop=(ex,sets)=>sets.length>=1&&sets.every(s=>s.r>=ex.rep[1]);
+const wkRep=s=>(s&&s.rL!=null)?Math.min(s.r||0,s.rL||0):((s&&s.r)||0);
+const bestScore=sets=>sets.reduce((m,s)=>Math.max(m,(s.k||0)*1000+(wkRep(s)||0)),0);
+const allTop=(ex,sets)=>sets.length>=1&&sets.every(s=>wkRep(s)>=ex.rep[1]);
 function isStalled(ex){if(ex.prog==="none")return false;const p=lastEntries(ex.id,3);if(p.length<3)return false;if(p[0].up||allTop(ex,p[0].sets))return false;if(p[0].sets.every(s=>s.rir!=null&&s.rir>=3))return false;return bestScore(p[0].sets)<=bestScore(p[2].sets)}
 function stalledList(){return ALL_EX.filter(isStalled)}
 function suggest(ex){
@@ -513,8 +517,8 @@ function suggest(ex){
  if(v&&v.code==="addset")return{tone:"up",do:"4 sèries avui · 5–8 reps",msg:"3×8 netes → escalada v2: avui passes a 4 sèries.",four:true};
  if(v&&v.code==="down")return{tone:"down",do:"Baixa una mica la càrrega",msg:"L'últim dia no vas arribar a "+ex.rep[0]+(ex.time?" s":" reps")+" en alguna sèrie → ajusta avall i torna a dominar el rang."};
  if(v&&v.code==="easy")return{tone:"warn",do:"+2 reps per sèrie o puja pes ja",msg:"Tot el dia a RIR 3+ dins del rang: massa fàcil. Avui força +2 reps per sèrie o puja càrrega directament."};
- if(L.sets.some(s=>s.r>ex.rep[1]+2))return{tone:"warn",do:"Puja càrrega ja",msg:"Vas passar el rang de llarg: la càrrega era massa baixa."};
- return{tone:"hold",do:"Mateix pes · +1 rep per sèrie",msg:"Dins del rang. Avui suma 1 rep a cada sèrie respecte a l'últim dia ("+L.sets.map(s=>s.r).join("/")+")."};
+ if(L.sets.some(s=>wkRep(s)>ex.rep[1]+2))return{tone:"warn",do:"Puja càrrega ja",msg:"Vas passar el rang de llarg: la càrrega era massa baixa."};
+ return{tone:"hold",do:"Mateix pes · +1 rep per sèrie",msg:"Dins del rang. Avui suma 1 rep a cada sèrie respecte a l'últim dia ("+L.sets.map(s=>wkRep(s)).join("/")+")."};
 }
 function deloadActive(){return D.deloadUntil&&todayISO()<=D.deloadUntil}
 function lastWorkoutISO(){return D.history.length?D.history[D.history.length-1].dateISO:null}
@@ -581,7 +585,7 @@ function figStatic(ex,size){
  BONES.forEach(b=>{const a=F.A[b[0]],c=F.A[b[1]];if(a&&c)h+='<line class="bone" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+c[0]+'" y2="'+c[1]+'"/>'});
  return h+'<circle class="bhead" cx="'+F.A.h[0]+'" cy="'+F.A.h[1]+'" r="5.5"/></svg>';
 }
-function bestEver(exId){let bk=0,br=0;D.history.forEach(h=>{const e=h.entries&&h.entries[exId];if(e)e.sets.forEach(s=>{const k=s.k||0;if(k>bk){bk=k;br=s.r||0}else if(k===bk&&(s.r||0)>br)br=s.r||0})});return{bk:bk,br:br}}
+function bestEver(exId){let bk=0,br=0;D.history.forEach(h=>{const e=h.entries&&h.entries[exId];if(e)e.sets.forEach(s=>{const k=s.k||0,r=wkRep(s)||0;if(k>bk){bk=k;br=r}else if(k===bk&&r>br)br=r})});return{bk:bk,br:br}}
 
 function parseTempo(t){t=(t||"").toLowerCase();if(t.indexOf("isom")>=0)return{iso:1};const m=t.match(/(\d+)\s*-\s*(\d+)\s*-\s*(\d+)/);if(m)return{e:+m[1],p:+m[2],c:+m[3]};if(t.indexOf("ecc")>=0)return{e:3,p:0,c:1};if(t==="lent")return{e:2,p:0,c:2};return{e:2,p:0,c:1}}
 const sm=t=>t*t*(3-2*t);
@@ -619,12 +623,12 @@ function figDraw(pose){
 }
 function lerpPose(A,B,t){const o={};for(const k in A){if(B[k])o[k]=[A[k][0]+(B[k][0]-A[k][0])*t,A[k][1]+(B[k][1]-A[k][1])*t];else o[k]=A[k]}return o}
 
-function loggedSets(d){return d.sets.filter(s=>s.r>0&&s.rir!=null).map(s=>({r:s.r,k:s.k,rir:s.rir}))}
+function loggedSets(d){return d.sets.filter(s=>s.r>0&&s.rir!=null).map(s=>({r:s.r,k:s.k,rir:s.rir,rL:s.rL}))}
 function evalExercise(ex,sets){
  if(ex.prog==="none"||!sets.length)return null;
- const top=sets.every(s=>s.r>=ex.rep[1]);
+ const top=sets.every(s=>wkRep(s)>=ex.rep[1]);
  const easy=sets.every(s=>s.rir!=null&&s.rir>=3);
- const low=sets.some(s=>s.r<ex.rep[0]);
+ const low=sets.some(s=>wkRep(s)<ex.rep[0]);
  if(ex.prog==="pullup"){
   if(top&&sets.length>=4)return{code:"level",up:true};
   if(top&&sets.length===3)return{code:"addset",up:false};
@@ -647,7 +651,7 @@ function plates(total){
  return{bar:false,out:out,rem:rem};
 }
 
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const $=s=>document.querySelector(s);
 let UI={screen:"home",workout:null,summary:null,over:null,toastTm:null,exitArm:0};
@@ -700,7 +704,8 @@ async function wakeOn(){try{if("wakeLock"in navigator)WL=await navigator.wakeLoc
 function wakeOff(){try{if(WL){WL.release();WL=null}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"){ if(UI.workout)wakeOn(); reconcileRest(); } else save(); });
 
-function setMode(){try{let m="";if(UI.workout){const sk=UI.workout.sk;m=sk.indexOf("PULL")===0?"pull":sk.indexOf("LEGS")===0?"legs":"push"}if(m)document.body.setAttribute("data-mode",m);else document.body.removeAttribute("data-mode")}catch(e){}}
+function syncThemeColor(){try{const m=document.body.getAttribute("data-mode");const c=m==="pull"?"#0A1418":m==="legs"?"#0F0E1A":"#0B0E15";const t=document.querySelector('meta[name="theme-color"]');if(t&&t.getAttribute("content")!==c)t.setAttribute("content",c)}catch(e){}}
+function setMode(){try{let m="";if(UI.workout){const sk=UI.workout.sk;m=sk.indexOf("PULL")===0?"pull":sk.indexOf("LEGS")===0?"legs":"push"}if(m)document.body.setAttribute("data-mode",m);else document.body.removeAttribute("data-mode")}catch(e){}syncThemeColor()}
 
 const curS=()=>SESSIONS[UI.workout.sk];
 const curEx=()=>curS().ex[UI.workout.ei];
@@ -713,7 +718,7 @@ function nextUnlogged(ei,si){let p=nextSeq(ei,si);while(p){const s=UI.workout.dr
 
 function showToast(ic,msg,ms){const host=document.getElementById("toast-host");if(!host)return;host.innerHTML='<div class="toast" role="status">'+(ic?'<span class="ti">'+ic+'</span>':'')+'<span>'+esc(msg)+'</span></div>';if(UI.toastTm)clearTimeout(UI.toastTm);UI.toastTm=setTimeout(()=>{host.innerHTML=""},ms||3400)}
 
-function swap(html,after){const el=document.getElementById("app");const run=()=>{el.innerHTML=html;if(after)after()};if(document.startViewTransition&&!reduceMotion()){document.startViewTransition(run)}else run()}
+function swap(html,after){const el=document.getElementById("app");const run=()=>{el.innerHTML=html;if(after)after();syncThemeColor()};if(document.startViewTransition&&!reduceMotion()){document.startViewTransition(run)}else run()}
 function render(){if(UI.workout||UI.summary)return;buildHome()}
 
 function tabBar(active){const T=[["avui","today","Avui"],["progres","chart","Progrés"],["pla","book","Pla"],["jo","gear","Jo"]];return '<nav class="tabs" aria-label="Navegació principal">'+T.map(t=>'<button class="tap'+(t[0]===active?' on':'')+'" '+(t[0]===active?'aria-current="page"':'data-a="tab" data-t="'+t[0]+'"')+' aria-label="'+t[2]+'">'+icon(t[1],21)+'<span>'+t[2]+'</span></button>').join("")+'</nav>'}
@@ -819,7 +824,7 @@ function syncFocus(){
  F.serie.innerHTML=(w.si+1)+'<small>/'+d.sets.length+'</small>';
  F.objr.innerHTML=ex.rep[0]+'–'+ex.rep[1]+'<small> '+(ex.time?"s":"reps")+'</small>';
  if(ex.side){F.sidepill.style.display="block";F.sidepill.textContent="Costat "+(w.sideIdx===0?"ESQUERRE → després el dret":"DRET · l'últim")}else F.sidepill.style.display="none";
- if(s.rir!=null){F.savedWrap.style.display="block";F.savedTxt.innerHTML=icon("check",13)+' Sèrie '+(w.si+1)+' desada · RIR '+(s.rir===3?"3+":s.rir)+(s.k?" · "+s.k+" kg":"")+' · '+s.r+(ex.time?" s":" reps")}else F.savedWrap.style.display="none";
+ if(s.rir!=null){F.savedWrap.style.display="block";F.savedTxt.innerHTML=icon("check",13)+' Sèrie '+(w.si+1)+' desada · RIR '+(s.rir===3?"3+":s.rir)+(s.k?" · "+s.k+" kg":"")+' · '+((ex.side&&s.rL!=null)?('E'+s.rL+'/D'+s.r):s.r)+(ex.time?" s":" reps")}else F.savedWrap.style.display="none";
  if(!P)F.wcount.textContent=(s.r||0);
  F.wcountUnit.textContent=ex.time?"segons":"reps";
 
@@ -830,7 +835,8 @@ function syncFocus(){
      const unit = ex.time ? "s" : " reps";
      let setsInfo = last.sets.map(x => {
          let rirTxt = x.rir != null ? (x.rir === 3 ? "3+" : x.rir) : "?";
-         return `${x.r}${unit}${x.k ? ' · '+x.k+'kg' : ''} <span style="color:var(--mut);font-size:10px;">(RIR ${rirTxt})</span>`;
+         let repsTxt = (x.rL != null) ? ('E'+x.rL+'/D'+x.r) : (''+x.r);
+         return `${repsTxt}${unit}${x.k ? ' · '+x.k+'kg' : ''} <span style="color:var(--mut);font-size:10px;">(RIR ${rirTxt})</span>`;
      }).join(' &nbsp;·&nbsp; ');
      F.lastCard.innerHTML = '<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);">Última vegada · '+fmtD(last.date)+'</div>'+
                             '<div style="margin-top:6px;font-size:14px;color:var(--txt);line-height:1.4;">'+setsInfo+'</div>';
@@ -840,7 +846,7 @@ function syncFocus(){
  // =========================================
 
  F.chips.innerHTML='<span class="chip">Tempo '+esc(ex.tempo)+'</span><span class="chip">Descans '+fmtT(ex.rest)+'</span>'+(/Barra/.test(ex.load)?'<span class="chip tap" data-a="plates">'+icon("weight",13)+' Discos</span>':'');
- if(w.info){const last=lastEntries(ex.id,1)[0];F.info.style.display="block";F.info.innerHTML='<div class="tech">'+esc(ex.tech)+'</div>'+((dl||w.soft)?'':'<div class="sug '+d.sug.tone+'">'+esc(d.sug.msg)+'</div>')+(last?'<div class="last">Últ. ('+fmtD(last.date)+'): '+last.sets.map(x=>x.r+(x.k?"@"+x.k:"")).join(" · ")+'</div>':'')}else F.info.style.display="none";
+ if(w.info){const last=lastEntries(ex.id,1)[0];F.info.style.display="block";F.info.innerHTML='<div class="tech">'+esc(ex.tech)+'</div>'+((dl||w.soft)?'':'<div class="sug '+d.sug.tone+'">'+esc(d.sug.msg)+'</div>')+(last?'<div class="last">Últ. ('+fmtD(last.date)+'): '+last.sets.map(x=>(x.rL!=null?x.rL+"/"+x.r:x.r)+(x.k?"@"+x.k:"")).join(" · ")+'</div>':'')}else F.info.style.display="none";
  F.doCaret.textContent=w.info?"▴ tanca":"perquè?";
  F.rirHint.textContent=(ex.side&&w.sideIdx===0)?"RIR d'aquest costat — després canvies de membre":("Tria el RIR i la sèrie es desa sola · objectiu "+ex.rirT);
  F.addBtn.style.display=(w.si===d.sets.length-1)?"flex":"none";
@@ -850,7 +856,7 @@ function syncFocus(){
  F._exId=ex.id;setMode();
 }
 
-function wheelVals(kind,ex){if(kind==="kg"){const a=[];for(let v=0;v<=120;v+=.5)a.push(v);return a}if(ex.time){const a=[];for(let v=0;v<=120;v+=5)a.push(v);return a}const a=[];for(let v=0;v<=30;v++)a.push(v);return a}
+function wheelVals(kind,ex){if(kind==="kg"){const a=[];for(let v=0;v<=120;v+=.5)a.push(v);return a}if(ex.time){const a=[];for(let v=0;v<=120;v+=5)a.push(v);return a}const a=[];for(let v=0;v<=50;v++)a.push(v);return a}
 function wheelIdx(kind,ex,val){const vals=wheelVals(kind,ex);let b=0,bd=1e9;vals.forEach((v,i)=>{const dd=Math.abs(v-val);if(dd<bd){bd=dd;b=i}});return b}
 function wheelItems(kind,ex){const vals=wheelVals(kind,ex);let h='<div class="wpad" aria-hidden="true"></div>';vals.forEach((v,i)=>h+='<div class="witem" aria-hidden="true" data-wi="'+i+'">'+(kind==="kg"?(v%1?v.toFixed(1):v):v)+'</div>');return h+'<div class="wpad" aria-hidden="true"></div>'}
 function updateWheelA11y(kind,val,ex){const el=F["wheel"+kind];if(!el)return;const max=kind==="kg"?120:ex_time_max();const label=kind==="kg"?(val+" kg"):(val+(ex&&ex.time?" segons":" reps"));el.setAttribute("aria-valuemin","0");el.setAttribute("aria-valuemax",String(max));el.setAttribute("aria-valuenow",String(val));el.setAttribute("aria-valuetext",label)}
@@ -863,8 +869,8 @@ function attachWheel(kind){
 }
 function syncWheels(rebuild){F.silentUntil=Date.now()+500;const ex=curEx(),s=curDraft().sets[UI.workout.si];["reps","kg"].forEach(kind=>{const el=F["wheel"+kind];if(!el)return;if(rebuild)el.innerHTML=wheelItems(kind,ex);const val=kind==="kg"?(s.k||0):(s.r||0);el.scrollTop=wheelIdx(kind,ex,val)*ITEM_H;updateWheelA11y(kind,val,ex)});if(F.wlabReps)F.wlabReps.textContent=ex.time?"segons":("reps"+(ex.side?" /"+ex.side:""))}
 function setWheel(kind,val){F.silentUntil=Date.now()+600;const el=F["wheel"+kind];if(el){el.scrollTo({top:wheelIdx(kind,curEx(),val)*ITEM_H,behavior:reduceMotion()?"auto":"smooth"});updateWheelA11y(kind,val,curEx())}}
-function nudge(kind,delta){const w=UI.workout;if(!w)return;const s=curDraft().sets[w.si];if(kind==="kg"){let v=Math.max(0,Math.min(120,(s.k||0)+delta));v=Math.round(v*2)/2;applyKg(v);setWheel("kg",v)}else{let v=Math.max(0,Math.min(ex_time_max(),(s.r||0)+delta));s.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;setWheel("reps",v)}updateWheelA11y(kind,kind==="kg"?(s.k||0):(s.r||0),curEx());checkRepColor();haptic("sel");saveDraft()}
-function ex_time_max(){return curEx().time?120:30}
+function nudge(kind,delta){const w=UI.workout;if(!w)return;const s=curDraft().sets[w.si];if(kind==="kg"){let v=Math.max(0,Math.min(120,(s.k||0)+delta));v=Math.round(v*2)/2;applyKg(v);setWheel("kg",v)}else{if(curEx().time)delta*=5;let v=Math.max(0,Math.min(ex_time_max(),(s.r||0)+delta));s.r=v;curDraft().touched=curDraft().touched||v>0;if(F.wcount&&!P)F.wcount.textContent=v;setWheel("reps",v)}updateWheelA11y(kind,kind==="kg"?(s.k||0):(s.r||0),curEx());checkRepColor();haptic("sel");saveDraft()}
+function ex_time_max(){return curEx().time?120:50}
 
 function copySet(){
     const w=UI.workout;if(!w)return;
@@ -931,13 +937,13 @@ function commitSet(rir){
  const w=UI.workout;if(!w)return;const ex=curEx(),d=curDraft(),s=d.sets[w.si];
  if(P)pacerStop(true);
  if(!(s.r>0)){showToast(icon("close",16),"Marca reps/segons abans de desar la sèrie");haptic("warn");return}
- if(ex.side&&w.sideIdx===0){w.sideIdx=1;s.rirL=rir;saveDraft();sndPause();haptic("warn");flashSide();syncFocus();return}
+ if(ex.side&&w.sideIdx===0){w.sideIdx=1;s.rirL=rir;s.rL=s.r;s.kL=s.k;saveDraft(true);sndPause();haptic("warn");flashSide();syncFocus();return}
  s.rir=(s.rirL!=null)?Math.min(rir,s.rirL):rir;delete s.rirL;
  if(typeof s.r!=="number")s.r=0;d.touched=d.touched||s.r>0;
  if(d.sets.every(x=>x.rir!=null)){const vv=evalExercise(ex,loggedSets(d));if(vv)w.verdicts[ex.id]=vv;else delete w.verdicts[ex.id]}
- saveDraft();startRest();
+ saveDraft(true);startRest();
 }
-function clearSet(){const w=UI.workout,d=curDraft(),s=d.sets[w.si],ex=curEx();s.rir=null;delete s.rirL;w.sideIdx=0;if(w.verdicts[ex.id])delete w.verdicts[ex.id];saveDraft();syncFocus();haptic("sel")}
+function clearSet(){const w=UI.workout,d=curDraft(),s=d.sets[w.si],ex=curEx();s.rir=null;delete s.rirL;delete s.rL;delete s.kL;w.sideIdx=0;if(w.verdicts[ex.id])delete w.verdicts[ex.id];saveDraft();syncFocus();haptic("sel")}
 function addSet(){const w=UI.workout,d=curDraft(),last=d.sets[d.sets.length-1];d.sets.push({r:last?last.r:0,k:last?last.k:0,rir:null});w.si=d.sets.length-1;w.sideIdx=0;saveDraft();syncFocus();haptic("tick")}
 function gotoPos(p){const w=UI.workout;pacerStop(false);w.ei=p.ei;w.si=p.si;w.sideIdx=0;w.phase="set";saveDraft();syncFocus();if(D.set.autopacer&&!P)pacerStart()}
 function navStep(dir){const w=UI.workout;pacerStop(false);if(dir>0){const n=nextSeq(w.ei,w.si);if(n)gotoPos(n);else gotoFinish()}else{if(w.si>0)gotoPos({ei:w.ei,si:w.si-1});else if(w.ei>0){const pe=w.ei-1,pd=w.draft[curS().ex[pe].id];gotoPos({ei:pe,si:pd.sets.length-1})}}}
@@ -1051,15 +1057,15 @@ function saveNote(){
     }
     closeOver();
 }
-function openSettings(replace){const set=D.set,sw=on=>'<span class="sw'+(on?" on":"")+'"><i></i></span>';let h='<div class="sheetlbl">'+icon("gear",12)+' Ajustos</div>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.sound?"true":"false")+'" data-a="togglesound" style="width:100%;text-align:left"><span>So del marcador</span>'+sw(set.sound)+'</button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.autopacer?"true":"false")+'" data-a="toggleauto" style="width:100%;text-align:left"><span>Iniciar ritme automàtic</span>'+sw(set.autopacer)+'</button>';h+='<button class="srow tap" data-a="cycleprep" style="width:100%;text-align:left"><span>Compte enrere d\'inici</span><span class="st">'+(set.prep||6)+' s</span></button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.perf?"true":"false")+'" data-a="toggleperf" style="width:100%;text-align:left"><span>Mode rendiment</span>'+sw(set.perf)+'</button>';h+='<button class="srow tap" data-a="testsound" style="width:100%;text-align:left"><span>Provar so</span><span class="st">'+icon("play",15)+'</span></button>';h+='<button class="srow tap" data-a="backup" style="width:100%;text-align:left"><span>Exportar còpia (.json)</span><span class="st">'+icon("undo",15)+'</span></button>';h+='<button class="srow tap" data-a="backupcsv" style="width:100%;text-align:left"><span>Exportar historial (.csv)</span><span class="st">CSV</span></button>';h+='<div class="note"><b>v10.2 QoL:</b> HTML autònom, cache offline, notes de sessió, còpia ràpida de sèries, alerta visual de sèrie fallida i drecera per acabar. <br><br><b>Sobre la vibració:</b> a iOS el web només pot donar resposta tàctil limitada. Per a hàptica rica i alarmes amb pantalla bloquejada cal versió nativa.</div>';if(replace){const sh=document.querySelector("#overlay-host .sheet2");if(sh){sh.innerHTML=h;return}}openSheet(h)}
+function openSettings(replace){const set=D.set,sw=on=>'<span class="sw'+(on?" on":"")+'"><i></i></span>';let h='<div class="sheetlbl">'+icon("gear",12)+' Ajustos</div>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.sound?"true":"false")+'" data-a="togglesound" style="width:100%;text-align:left"><span>So del marcador</span>'+sw(set.sound)+'</button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.autopacer?"true":"false")+'" data-a="toggleauto" style="width:100%;text-align:left"><span>Iniciar ritme automàtic</span>'+sw(set.autopacer)+'</button>';h+='<button class="srow tap" data-a="cycleprep" style="width:100%;text-align:left"><span>Compte enrere d\'inici</span><span class="st">'+(set.prep||6)+' s</span></button>';h+='<button class="srow tap" role="switch" aria-checked="'+(set.perf?"true":"false")+'" data-a="toggleperf" style="width:100%;text-align:left"><span>Mode rendiment</span>'+sw(set.perf)+'</button>';h+='<button class="srow tap" data-a="testsound" style="width:100%;text-align:left"><span>Provar so</span><span class="st">'+icon("play",15)+'</span></button>';h+='<button class="srow tap" data-a="backup" style="width:100%;text-align:left"><span>Exportar còpia (.json)</span><span class="st">'+icon("undo",15)+'</span></button>';h+='<button class="srow tap" data-a="backupcsv" style="width:100%;text-align:left"><span>Exportar historial (.csv)</span><span class="st">CSV</span></button>';h+='<div class="note"><b>v10.4:</b> tint de la barra d\'estat segons el bloc (push/pull/legs), estat buit amb icona, cache offline real (service worker), registre per costat (E/D) als unilaterals, notes de sessió, còpia ràpida de sèries, alerta visual de sèrie fallida i desat optimitzat. <br><br><b>Sobre la vibració:</b> a iOS el web només pot donar resposta tàctil limitada. Per a hàptica rica i alarmes amb pantalla bloquejada cal versió nativa.</div>';if(replace){const sh=document.querySelector("#overlay-host .sheet2");if(sh){sh.innerHTML=h;return}}openSheet(h)}
 function openConfirmFinish(names){let h='<div class="sheetlbl">'+icon("list",12)+' Acabar sense desar-ho tot?</div><div class="note" style="margin-top:14px">Aquests exercicis no tenen cap sèrie registrada i no es desaran:</div><div style="margin-top:8px">'+names.map(n=>'<div class="plrow"><span>'+esc(n)+'</span><span class="mut">sense dades</span></div>').join("")+'</div><div class="rbtns" style="margin-top:18px"><button class="fnav tap" data-a="cancelfinish">Tornar</button><button class="fnav tap" data-a="forcefinish" style="background:var(--accso);color:var(--acc2)">Desar igualment →</button></div>';openSheet(h)}
 
-function exitWorkout(){UI.exitArm=0;const w=UI.workout;pacerStop(false);if(w&&w.restIv)clearInterval(w.restIv);const ov=document.getElementById("restwrap");if(ov)ov.remove();if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}wakeOff();saveDraft();UI.workout=null;F={};buildHome()}
+function exitWorkout(){UI.exitArm=0;const w=UI.workout;pacerStop(false);if(w&&w.restIv)clearInterval(w.restIv);const ov=document.getElementById("restwrap");if(ov)ov.remove();if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}wakeOff();saveDraft(true);UI.workout=null;F={};buildHome()}
 function downloadBlob(name,type,text){const blob=new Blob([text],{type});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);a.remove()}
 function exportData(){try{downloadBlob("hollywood-protocol-backup-"+todayISO()+".json","application/json",JSON.stringify(D,null,1));D.lastBackup=todayISO();save()}catch(e){}}
 function csvCell(v){v=v==null?"":String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 function exportCSV(){try{const rows=[["date","session","exercise_id","exercise","set","reps_or_seconds","kg","rir","level_up","duration_min"]];D.history.forEach(h=>{Object.keys(h.entries||{}).forEach(id=>{const ex=EX(id),e=h.entries[id];(e.sets||[]).forEach((st,i)=>rows.push([h.dateISO,h.sessionKey,id,ex?ex.name:id,i+1,st.r||0,st.k||0,st.rir==null?"":st.rir,(h.levelUps||[]).indexOf(id)>=0?1:0,h.dur||""]))})});downloadBlob("hollywood-protocol-history-"+todayISO()+".csv","text/csv;charset=utf-8",rows.map(r=>r.map(csvCell).join(",")).join("\n"));D.lastBackup=todayISO();save()}catch(e){showToast(icon("close",16),"No s'ha pogut exportar CSV")}}
-function saveDraft(){const w=UI.workout;if(!w){D.draft=null;save();return}const sets={};curS().ex.forEach(e=>{sets[e.id]=w.draft[e.id].sets.map(s=>({r:s.r,k:s.k,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL}))});D.draft={sk:w.sk,dateISO:todayISO(),t0:w.t0,soft:w.soft?1:0,sets,verdicts:w.verdicts||{},ei:w.ei,si:w.si,sideIdx:w.sideIdx,phase:w.phase,note:w.note||""};save()}
+function saveDraft(now){const w=UI.workout;if(!w){D.draft=null;save();return}const sets={};curS().ex.forEach(e=>{sets[e.id]=w.draft[e.id].sets.map(s=>({r:s.r,k:s.k,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL,rL:s.rL,kL:s.kL}))});D.draft={sk:w.sk,dateISO:todayISO(),t0:w.t0,soft:w.soft?1:0,sets,verdicts:w.verdicts||{},ei:w.ei,si:w.si,sideIdx:w.sideIdx,phase:w.phase,note:w.note||""};if(now)save();else saveSoon()}
 function startWorkout(){
  const sk=CYCLE[D.cycleIndex%8];if(sk==="REST")return;
  const S=SESSIONS[sk],draft={},t=gapTier();
@@ -1069,13 +1075,13 @@ function startWorkout(){
   const prev=lastEntries(ex.id,1)[0],sug=suggest(ex);
   let n=deloadActive()?2:ex.sets;if(sug.four&&!deloadActive())n=4;if(sug.five&&!deloadActive())n=5;
   let sets=[];
-  if(res&&Array.isArray(res.sets[ex.id])&&res.sets[ex.id].length)sets=res.sets[ex.id].map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL}));
+  if(res&&Array.isArray(res.sets[ex.id])&&res.sets[ex.id].length)sets=res.sets[ex.id].map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir,rirL:s.rirL==null?null:s.rirL,rL:s.rL,kL:s.kL}));
   else for(let i=0;i<n;i++){const p=prev&&prev.sets[Math.min(i,prev.sets.length-1)];sets.push({r:p?p.r:0,k:p?p.k:0,rir:null})}
   draft[ex.id]={sets,touched:false,sug};
  });
  UI.workout={sk,draft,ei:0,si:0,sideIdx:0,phase:"set",soft:res?!!res.soft:(t===2&&!deloadActive()),rest:null,info:false,t0:res?res.t0:Date.now(),verdicts:res?(res.verdicts||{}):{},restIv:null,note:res?(res.note||""):""};
  if(res){let nu=null;outer:for(let i=0;i<S.ex.length;i++){const ss=draft[S.ex[i].id].sets;for(let j=0;j<ss.length;j++)if(ss[j].rir==null){nu={ei:i,si:j};break outer}}if(nu){UI.workout.ei=nu.ei;UI.workout.si=nu.si;const ne=S.ex[nu.ei],st=draft[ne.id].sets[nu.si];UI.workout.sideIdx=(ne.side&&st&&st.rirL!=null)?1:0}else{UI.workout.ei=Math.min(res.ei||0,S.ex.length-1);UI.workout.si=Math.max(0,res.si||0);UI.workout.sideIdx=res.sideIdx?1:0}const ne=S.ex[UI.workout.ei];setTimeout(()=>showToast(icon("undo",16),"Sessió recuperada · continues a "+ne.name.split(" (")[0]),260)}
- wakeOn();saveDraft();buildFocus();
+ wakeOn();saveDraft(true);buildFocus();
 }
 
 function attachSwipe(){const el=document.querySelector("#focusScreen .fbody");if(!el)return;let x0=null,y0=null;el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});el.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;if(Math.abs(dx)>72&&Math.abs(dx)>Math.abs(dy)*1.6){if(dx<0)navStep(1);else navStep(-1);haptic("sel")}x0=null},{passive:true})}
@@ -1178,7 +1184,7 @@ function buildProgress(){
  UI.workout=null;UI.summary=null;document.body.removeAttribute("data-mode");
  const H=D.history;
  if(!H.length){
-  swap(`<div class="wrap"><header class="top"><div class="brand"><div class="slate">${icon("chart",13)} Progrés</div><h1>El teu rastre</h1><div class="sub">Encara sense dades</div></div></header><div class="empty" style="padding-top:16vh">Encara no has entrenat.<br>Quan acabis la primera sessió veuràs aquí la teva evolució: sessions per setmana, ratxes i pujades de nivell.</div></div>`+tabBar("progres"));
+  swap(`<div class="wrap"><header class="top"><div class="brand"><div class="slate">${icon("chart",13)} Progrés</div><h1>El teu rastre</h1><div class="sub">Encara sense dades</div></div></header><div class="empty" style="padding-top:16vh"><div style="color:var(--acc2);opacity:.55;margin-bottom:16px">${icon("chart",44)}</div>Encara no has entrenat.<br>Quan acabis la primera sessió veuràs aquí la teva evolució: sessions per setmana, ratxes i pujades de nivell.</div></div>`+tabBar("progres"));
   return;
  }
  const days=new Set(H.map(x=>x.dateISO)).size;
@@ -1251,7 +1257,7 @@ function buildJo(){
   <div class="chartcard"><button class="btn btn-ink tap" data-a="joexport" style="margin-bottom:10px">${icon("undo",15)} Exportar còpia (.json)</button><button class="btn btn-line tap" data-a="joexportcsv" style="margin-bottom:10px">Exportar historial (.csv)</button><button class="btn btn-line tap" data-a="joimport" style="margin-bottom:10px">Importar còpia</button><button class="btn btn-line tap" data-a="joeditlast" data-from="jo" style="margin-bottom:10px">Corregir pesos de l'última sessió</button><button class="btn btn-line tap" data-a="joundo" style="margin-bottom:10px">Desfer última sessió</button><button class="btn btn-ghost tap" data-a="joreset" style="color:var(--bad);border-color:rgba(255,100,100,.4)">Esborrar totes les dades</button>
    <div class="note">Estat: ${storageOK?"desant correctament al dispositiu":`<span style="color:var(--bad)">no es pot desar (mode privat?)</span>`}${D.lastBackup?` · última còpia ${fmtD(D.lastBackup)}`:" · sense còpia encara"}.</div></div>
   <div class="scrtitle">Sobre l'app</div>
-  <div class="chartcard"><div class="note" style="margin-top:0"><b>Companion v10.2 QoL · build auditada.</b> Capa visual original conservada amb persistència robusta, drafts complets, importació validada, mode rendiment, export CSV segur i millores de focus/accessibilitat.<br><br><b>Vibració a iOS:</b> el web només permet resposta tàctil mínima. La háptica completa del Taptic Engine arriba amb la versió nativa (Capacitor). El temporitzador en segon pla es reconcilia en tornar a primer pla; l'alarma fiable amb pantalla bloquejada també és nativa.</div></div>
+  <div class="chartcard"><div class="note" style="margin-top:0"><b>Companion v10.4 · build auditada.</b> Capa visual original conservada amb persistència robusta, drafts complets, importació validada, mode rendiment, export CSV segur i millores de focus/accessibilitat.<br><br><b>Vibració a iOS:</b> el web només permet resposta tàctil mínima. La háptica completa del Taptic Engine arriba amb la versió nativa (Capacitor). El temporitzador en segon pla es reconcilia en tornar a primer pla; l'alarma fiable amb pantalla bloquejada també és nativa.</div></div>
  </div>`+tabBar("jo"));
 }
 
@@ -1269,7 +1275,7 @@ function editSession(idx, from){
  const h=D.history[idx],S=SESSIONS[h.sessionKey];
  if(!S){showToast(icon("close",16),"Sessió desconeguda");return}
  const sets={};
- S.ex.forEach(ex=>{const e=h.entries&&h.entries[ex.id];if(e&&Array.isArray(e.sets)&&e.sets.length)sets[ex.id]=e.sets.map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir}))});
+ S.ex.forEach(ex=>{const e=h.entries&&h.entries[ex.id];if(e&&Array.isArray(e.sets)&&e.sets.length)sets[ex.id]=e.sets.map(s=>({r:s.r||0,k:s.k||0,rir:s.rir==null?null:s.rir,rL:s.rL,kL:s.kL}))});
  if(!Object.keys(sets).length){showToast(icon("close",16),"Aquesta sessió no té sèries registrades");return}
  UI.editLast={idx,sk:h.sessionKey,from:from||"progres",sets};
  openSheet(editLastHTML());
@@ -1305,7 +1311,7 @@ function applyEditLast(){
  const from=UI.editLast.from,idx=UI.editLast.idx,h=D.history[idx];
  if(!h){UI.editLast=null;closeOver();return}
  const S=SESSIONS[h.sessionKey],newEntries={};
- S.ex.forEach(ex=>{const work=UI.editLast.sets[ex.id];if(!work)return;const sets=work.map(cleanSet).filter(s=>s.r>0).map(s=>({r:s.r,k:s.k,rir:s.rir}));if(sets.length)newEntries[ex.id]={sets}});
+ S.ex.forEach(ex=>{const work=UI.editLast.sets[ex.id];if(!work)return;const sets=work.map(cleanSet).filter(s=>s.r>0).map(s=>({r:s.r,k:s.k,rir:s.rir,rL:s.rL}));if(sets.length)newEntries[ex.id]={sets}});
  if(!Object.keys(newEntries).length){showToast(icon("close",16),"Deixa almenys una sèrie amb reps > 0");return}
  const blockUps=!!h.deload||!!h.soft,oldUps=new Set(h.levelUps||[]),newUps=[],dec={};
  S.ex.forEach(ex=>{const e=newEntries[ex.id];if(!e)return;const logged=e.sets.filter(s=>s.r>0&&s.rir!=null);const vv=evalExercise(ex,logged);if(vv){dec[ex.id]=vv.code;if(vv.up&&!blockUps)newUps.push(ex.id)}});
