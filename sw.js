@@ -2,7 +2,7 @@
    Strategy: network-first for navigations (so an online open always gets the
    latest index.html), cache fallback when offline. Cache-first for other
    same-origin GETs. Self-updates promptly via skipWaiting + clients.claim. */
-const CACHE = "hp-cache-v1";
+const CACHE = "hp-cache-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
