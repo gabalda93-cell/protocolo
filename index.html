@@ -424,6 +424,9 @@ function addDaysISO(days){const d=new Date();d.setDate(d.getDate()+days);return 
 const fmtD=iso=>{const d=new Date(iso+"T12:00:00");return d.getDate()+"/"+(d.getMonth()+1)};
 const fmtT=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 const daysBetween=(a,b)=>Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5);
+function shiftISO(iso,days){const d=new Date((iso||todayISO())+"T12:00:00");d.setDate(d.getDate()+days);return localISO(d)}
+function weekStartISO(iso){const d=new Date((iso||todayISO())+"T12:00:00");const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);return localISO(d)}
+const sessionsThisWeek=()=>{const ws=weekStartISO();return D.history.filter(x=>x.dateISO>=ws).length};
 const fresh=()=>({v:10,rev:0,updatedAt:Date.now(),cycleIndex:0,startDate:todayISO(),lastDeload:todayISO(),deloadUntil:null,deloadMode:null,history:[],levels:{},set:{sound:1,prep:6,autopacer:0,perf:0},onboarded:0,lastBackup:null});
 let D=fresh(),storageOK=true,idb=null;
 function idbOpen(){return new Promise(function(res){try{const r=indexedDB.open("hp_db",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){res(r.result)};r.onerror=function(){res(null)}}catch(e){res(null)}})}
@@ -494,6 +497,8 @@ const bestScore=sets=>sets.reduce((m,s)=>Math.max(m,(s.k||0)*1000+(wkRep(s)||0))
 const allTop=(ex,sets)=>sets.length>=1&&sets.every(s=>wkRep(s)>=ex.rep[1]);
 function isStalled(ex){if(ex.prog==="none")return false;const p=lastEntries(ex.id,3);if(p.length<3)return false;if(p[0].up||allTop(ex,p[0].sets))return false;if(p[0].sets.every(s=>s.rir!=null&&s.rir>=3))return false;return bestScore(p[0].sets)<=bestScore(p[2].sets)}
 function stalledList(){return ALL_EX.filter(isStalled)}
+function kgStep(ex,big){const L=(ex.load||"").toLowerCase();if(L.indexOf("barra")>=0)return big?"+5 kg":"+2,5 kg";if(L.indexOf("xaleco")>=0)return big?"+5 kg":"+2,4 kg";if(L.indexOf("db")>=0)return big?"+4 kg (salta a la 2a DB)":"+2 kg (següent DB)";return big?"+5 kg":"+2,5 kg"}
+function progCue(ex,big){if(ex.prog==="none")return "afegeix reps o una variant més dura";if(ex.prog==="ladder")return ex.ladder?("progressa: "+ex.ladder):"passa a la variant més dura";if(ex.prog==="vest")return big?"+5 kg de xaleco":"+2,4 kg de xaleco";if(ex.prog==="time")return "afegeix llast";return kgStep(ex,big)}
 function suggest(ex){
  const rng=ex.sets+"×"+ex.rep[0]+"–"+ex.rep[1]+(ex.time?" s":"");
  const prev=lastEntries(ex.id,3);
@@ -511,14 +516,18 @@ function suggest(ex){
   if(ex.prog==="vest")return{tone:"up",do:(big?"+5 kg":"+2,4 kg")+" al xaleco · torna a "+ex.rep[0],msg:"NIVELL: rang complet"+(big?" amb RIR 3+ → salt doble de llast":"")+". Reconstrueix el rang."};
   if(ex.prog==="time")return{tone:"up",do:"Afegeix DB als peus",msg:"Tots els holds a "+ex.rep[1]+" s → toca llast. Torna a "+ex.rep[0]+" s amb pes."};
   if(ex.prog==="pullup")return{tone:"up",do:"Xaleco +2,4 kg · objectiu 4×5",msg:"4×8 netes l'últim dia → NIVELL: afegeix llast i torna a 5 reps per sèrie."};
-  return big?{tone:"up",do:"Puja càrrega (salt doble) · torna a "+ex.rep[0],msg:"NIVELL amb RIR 3+ a totes les sèries: et va sobrar molt. Salta dos passos de pes (+2,5–5 kg) i reconstrueix el rang."}
-            :{tone:"up",do:"Puja càrrega · torna a "+ex.rep[0]+" reps",msg:"NIVELL: rang complet. Següent DB/disc i a reconstruir."};
+  return big?{tone:"up",do:kgStep(ex,1)+" · torna a "+ex.rep[0],msg:"NIVELL amb RIR 3+ a totes les sèries: et va sobrar molt. Salt doble de càrrega ("+kgStep(ex,1)+") i reconstrueix el rang des de "+ex.rep[0]+" reps."}
+            :{tone:"up",do:kgStep(ex,0)+" · torna a "+ex.rep[0]+" reps",msg:"NIVELL: vas clavar les "+ex.rep[1]+(ex.time?" s":" reps")+" a totes les sèries. Puja la càrrega ("+kgStep(ex,0)+") i torna a "+ex.rep[0]+" reps per reconstruir el rang."};
  }
  if(v&&v.code==="addset")return{tone:"up",do:"4 sèries avui · 5–8 reps",msg:"3×8 netes → escalada v2: avui passes a 4 sèries.",four:true};
  if(v&&v.code==="down")return{tone:"down",do:"Baixa una mica la càrrega",msg:"L'últim dia no vas arribar a "+ex.rep[0]+(ex.time?" s":" reps")+" en alguna sèrie → ajusta avall i torna a dominar el rang."};
- if(v&&v.code==="easy")return{tone:"warn",do:"+2 reps per sèrie o puja pes ja",msg:"Tot el dia a RIR 3+ dins del rang: massa fàcil. Avui força +2 reps per sèrie o puja càrrega directament."};
- if(L.sets.some(s=>wkRep(s)>ex.rep[1]+2))return{tone:"warn",do:"Puja càrrega ja",msg:"Vas passar el rang de llarg: la càrrega era massa baixa."};
- return{tone:"hold",do:"Mateix pes · +1 rep per sèrie",msg:"Dins del rang. Avui suma 1 rep a cada sèrie respecte a l'últim dia ("+L.sets.map(s=>wkRep(s)).join("/")+")."};
+ if(v&&v.code==="easy")return{tone:"warn",do:"Fins a "+ex.rep[1]+(ex.time?" s":" reps")+" o "+progCue(ex,0),msg:"Tot el dia a RIR 3+ dins del rang: massa fàcil. Puja les reps fins a "+ex.rep[1]+(ex.time?" s":"")+" sense passar-te; si ja hi arribes sobrat, "+progCue(ex,0)+" directament."};
+ const reps=L.sets.map(s=>wkRep(s)),uS=ex.time?" s":" reps",capped=reps.filter(r=>r>=ex.rep[1]).length;
+ if(reps.some(r=>r>ex.rep[1]+2))return{tone:"warn",do:progCue(ex,1)+" ja",msg:"Vas passar el rang de llarg ("+reps.join("/")+"): la càrrega era massa baixa. "+progCue(ex,1)+" i torna a "+ex.rep[0]+(ex.time?" s":" reps")+"."};
+ if(capped===reps.length)return{tone:"up",do:progCue(ex,0),msg:"Domines tot el rang ("+reps.join("/")+" a "+ex.rep[1]+uS+"). Toca pujar d'estímul: "+progCue(ex,0)+"."};
+ if(capped)return{tone:"hold",do:"Mateix pes · iguala-les a "+ex.rep[1]+(ex.time?" s":""),msg:"Ja toques el sostre en "+capped+(capped>1?" sèries":" sèrie")+" ("+reps.join("/")+"). Mateix pes: puja NOMÉS les que es queden curtes fins a "+ex.rep[1]+uS+", sense passar-te. Quan les claves totes → "+progCue(ex,0)+"."};
+ const tgt=reps.map(r=>Math.min(r+(ex.time?3:1),ex.rep[1]));
+ return{tone:"hold",do:"Mateix pes · "+(ex.time?"+2–3 s":"+1 rep")+" per sèrie",msg:"Dins del rang. Mateix pes i puja cap al sostre sense passar de "+ex.rep[1]+uS+" (de "+reps.join("/")+" → "+tgt.join("/")+"). En tocar "+ex.rep[1]+" a totes, "+progCue(ex,0)+"."};
 }
 function deloadActive(){return D.deloadUntil&&todayISO()<=D.deloadUntil}
 function lastWorkoutISO(){return D.history.length?D.history[D.history.length-1].dateISO:null}
@@ -542,9 +551,9 @@ function coachMsgs(){
   else if(st.length)m.push({c:"hold",h:"Estancats: "+st.slice(0,2).map(e=>e.name.split(" ·")[0]).join(", ")+(st.length>2?" i "+(st.length-2)+" més":"")+". Tenen indicació especial avui — segueix-la i prou."});
  }
  if(m.length<2){
-  const wk=D.history.filter(x=>daysBetween(x.dateISO,today)<7).length;
-  if(wk>=5)m.push({c:"sage",h:"Ritme de pla: "+wk+" sessions en 7 dies. Objectiu V-taper en marxa — executa el call sheet i prou."});
-  else if(wk>=1&&t===0)m.push({c:"hold",h:wk+" sessions els últims 7 dies (objectiu ~5–6). Tot el que has de fer avui ja està decidit a sota."});
+  const wk=sessionsThisWeek();
+  if(wk>=5)m.push({c:"sage",h:"Ritme de pla: "+wk+" sessions aquesta setmana. Objectiu V-taper en marxa — executa el call sheet i prou."});
+  else if(wk>=1&&t===0)m.push({c:"hold",h:wk+" sessions aquesta setmana (objectiu ~5–6). Tot el que has de fer avui ja està decidit a sota."});
  }
  if(!m.length)m.push({c:"sage",h:"Tot en ordre. Objectiu: V-taper i recomposició. El pla pensa — tu executa."});
  if(storageOK&&D.history.length){
@@ -728,7 +737,7 @@ function buildHome(){
  if(Fraf){cancelAnimationFrame(Fraf);Fraf=0}
  const idx=D.cycleIndex%8,sk=CYCLE[idx],isRest=sk==="REST";
  const coach=coachMsgs();
- const wk=D.history.filter(x=>daysBetween(x.dateISO,todayISO())<7).length;
+ const wk=sessionsThisWeek();
  const totLv=Object.values(D.levels).reduce((a,b)=>a+b,0);
  let h='<div class="wrap">';
  h+='<header class="top"><div class="brand"><div class="slate">'+icon("slate",13)+'The Hollywood Protocol</div><h1>'+(isRest?"Descans":"Avui toca")+'</h1><div class="sub">Companion · dia '+(idx+1)+' / 8</div></div><button class="iconbtn tap tap-sm" data-a="settings" aria-label="Ajustos">'+icon("gear",20)+'</button></header>';
@@ -739,7 +748,7 @@ function buildHome(){
  }else{
   const S=SESSIONS[sk],first=S.ex[0];
   h+='<div class="today"><div class="figwrap">'+figStaticNamed(first,108)+'</div><div class="col"><div class="eyebrow">Sessió d\'avui</div><h2>'+esc(S.name)+'</h2><div class="focus">'+esc(S.focus)+'</div><div class="meta"><span><b>'+S.ex.length+'</b> exercicis</span><span><b>'+esc(S.dur)+'</b></span></div></div></div>';
-  h+='<div class="stats"><div class="stat"><b>'+wk+'</b><span>Sessions 7d</span></div><div class="stat"><b>'+totLv+'</b><span>Pujades nivell</span></div><div class="stat"><b>'+(idx+1)+'</b><span>Dia / 8</span></div></div>';
+  h+='<div class="stats"><div class="stat"><b>'+wk+'</b><span>Sessions setm.</span></div><div class="stat"><b>'+totLv+'</b><span>Pujades nivell</span></div><div class="stat"><b>'+(idx+1)+'</b><span>Dia / 8</span></div></div>';
   h+='<button class="btn btn-acc tap" data-a="start">'+((D.draft&&D.draft.dateISO===todayISO()&&D.draft.sk===sk)?'Continuar ':'Començar ')+esc(S.name)+'</button>';
  }
  h+='</div>'+tabBar("avui");
@@ -1190,7 +1199,7 @@ function buildProgress(){
  const days=new Set(H.map(x=>x.dateISO)).size;
  const totLv=Object.values(D.levels).reduce((a,b)=>a+b,0);
  const since=daysBetween(H[H.length-1].dateISO,todayISO());
- const weeks=[];for(let i=7;i>=0;i--){const c=H.filter(x=>{const d=daysBetween(x.dateISO,todayISO());return d>=i*7&&d<i*7+7}).length;weeks.push(c)}
+ const curWk=weekStartISO();const weeks=[];for(let i=7;i>=0;i--){const ws=shiftISO(curWk,-i*7),we=shiftISO(ws,7);weeks.push(H.filter(x=>x.dateISO>=ws&&x.dateISO<we).length)}
  const mx=Math.max(1,Math.max.apply(null,weeks));
  const bars=weeks.map((c,i)=>{const cur=i===weeks.length-1;const lab=i===0?"-7s":(cur?"ara":(weeks.length-1-i)+"s");return `<div class="b${cur?" cur":""}">${c?`<b>${c}</b>`:""}<i style="height:${Math.round(100*c/mx)}%"></i><u>${lab}</u></div>`}).join("");
  const lv=Object.entries(D.levels).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
